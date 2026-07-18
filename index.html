@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Civil Works DMS — WZPDCL</title>
+<script src="dc-runtime.js"></script>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  html,body{margin:0;padding:0;background:#F4F7F6;}
+  body{font-family:'IBM Plex Sans',sans-serif;color:#1A2E29;}
+  a{color:#0F5C4A;} a:hover{color:#0A4235;}
+  *{box-sizing:border-box;}
+  input,select,textarea,button{font-family:'IBM Plex Sans',sans-serif;}
+</style>
+</helmet>
+
+<sc-if value="{{ booting }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#F4F7F6">
+    <div style="width:42px;height:42px;border-radius:10px;background:#0F5C4A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px">CW</div>
+    <div style="font-size:13.5px;color:#5F726C">Restoring your session…</div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Login" style="min-height:100vh;background:linear-gradient(160deg,#0C2B25 0%,#0F4437 100%);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div style="width:400px;max-width:100%;display:flex;flex-direction:column;gap:16px">
+      <div style="background:#FFFFFF;border-radius:12px;padding:36px 32px;box-shadow:0 24px 60px rgba(0,0,0,0.35)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+          <div style="width:48px;height:48px;border-radius:10px;background:#0F5C4A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;letter-spacing:0.5px">CW</div>
+          <div>
+            <div style="font-size:17px;font-weight:700;line-height:1.2">Civil Works — File &amp; Work Management</div>
+            <div style="font-size:12.5px;color:#5F726C;margin-top:2px">P&amp;D, WZPDCL, Khulna</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#3D544D;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px">User ID</div>
+            <input value="{{ loginId }}" sc-camel-on-change="{{ onLoginId }}" placeholder="e.g. xen" style="width:100%;padding:10px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:14px;outline:none" style-focus="border-color:#0F5C4A;box-shadow:0 0 0 3px rgba(15,92,74,0.12)">
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#3D544D;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px">Password</div>
+            <input type="password" value="{{ loginPass }}" sc-camel-on-change="{{ onLoginPass }}" sc-camel-on-key-down="{{ onLoginKey }}" placeholder="••••••" style="width:100%;padding:10px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:14px;outline:none" style-focus="border-color:#0F5C4A;box-shadow:0 0 0 3px rgba(15,92,74,0.12)">
+          </div>
+          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FDECEA;color:#B42318;font-size:13px;padding:8px 12px;border-radius:8px">{{ loginErr }}</div>
+          </sc-if>
+          <button sc-camel-on-click="{{ doLogin }}" style="margin-top:4px;background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:12px;font-size:14.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">{{ loginBtnLabel }}</button>
+        </div>
+      </div>
+      <sc-if value="{{ showCreds }}" hint-placeholder-val="{{ false }}">
+        <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px 16px">
+          <div style="font-size:11.5px;font-weight:600;color:#9FC4B8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Demo accounts — click to fill</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ credChips }}" as="c" hint-placeholder-count="4">
+              <button sc-camel-on-click="{{ c.fill }}" style="background:rgba(255,255,255,0.12);color:#E4F0EB;border:none;border-radius:100px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'IBM Plex Mono',monospace" style-hover="background:rgba(255,255,255,0.22)">{{ c.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;min-height:100vh;align-items:stretch">
+  <div style="width:236px;flex:0 0 236px;background:#0C2B25;color:#DCEAE4;display:flex;flex-direction:column;padding:20px 14px;gap:4px">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 18px">
+      <div style="width:34px;height:34px;border-radius:8px;background:#0F5C4A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">CW</div>
+      <div>
+        <div style="font-size:13.5px;font-weight:700;color:#FFFFFF;line-height:1.15">Civil Works</div>
+        <div style="font-size:10.5px;color:#8BAEA2">P&amp;D · WZPDCL · Khulna</div>
+      </div>
+    </div>
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+      <button sc-camel-on-click="{{ n.go }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:{{ n.bg }};color:{{ n.fg }};border:none;border-radius:8px;padding:10px 12px;font-size:13.5px;font-weight:600;cursor:pointer;text-align:left;width:100%" style-hover="background:rgba(255,255,255,0.10)">
+        <span>{{ n.label }}</span>
+        <sc-if value="{{ n.hasCount }}" hint-placeholder-val="{{ false }}">
+          <span style="background:{{ n.cBg }};color:{{ n.cFg }};border-radius:100px;padding:1px 8px;font-size:11px;font-weight:700">{{ n.count }}</span>
+        </sc-if>
+      </button>
+    </sc-for>
+    <div style="flex:1"></div>
+    <div style="border-top:1px solid rgba(255,255,255,0.12);padding:14px 8px 4px;display:flex;flex-direction:column;gap:8px">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#FFFFFF">{{ meName }}</div>
+        <div style="font-size:11.5px;color:#8BAEA2">{{ meDesig }}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button sc-camel-on-click="{{ doLogout }}" style="background:rgba(255,255,255,0.10);color:#DCEAE4;border:none;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600;cursor:pointer" style-hover="background:rgba(255,255,255,0.20)">Sign out</button>
+        <button sc-camel-on-click="{{ openChangePass }}" style="background:transparent;color:#8BAEA2;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600;cursor:pointer" style-hover="background:rgba(255,255,255,0.10)">Change password</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <sc-if value="{{ isDash }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Dashboard" style="padding:28px 32px;display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:22px;font-weight:700">{{ greeting }}</div>
+            <div style="font-size:13.5px;color:#5F726C;margin-top:3px">{{ todayTxt }} · Here is your desk.</div>
+          </div>
+          <button sc-camel-on-click="{{ openNewFile }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">+ New file / letter</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:16px 18px">
+              <div style="font-size:12px;color:#5F726C;font-weight:600;text-transform:uppercase;letter-spacing:0.4px">{{ s.label }}</div>
+              <div style="font-size:28px;font-weight:700;margin-top:6px;color:{{ s.color }}">{{ s.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid #ECF1EF;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:15px;font-weight:700">My pending files</div>
+            <button sc-camel-on-click="{{ goFiles }}" style="background:none;border:none;color:#0F5C4A;font-size:13px;font-weight:600;cursor:pointer">View all files →</button>
+          </div>
+          <sc-if value="{{ inboxEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:32px;text-align:center;color:#5F726C;font-size:13.5px">Nothing pending on your desk.</div>
+          </sc-if>
+          <sc-for list="{{ inbox }}" as="f" hint-placeholder-count="3">
+            <div sc-camel-on-click="{{ f.open }}" style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid #F1F5F3;cursor:pointer" style-hover="background:#F6FAF8">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#0F5C4A;font-weight:600;flex:0 0 150px">{{ f.no }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.subject }}</div>
+                <div style="font-size:12px;color:#5F726C;margin-top:1px">{{ f.typeCat }} · from {{ f.lastFrom }}</div>
+              </div>
+              <div style="font-size:12px;color:#5F726C;flex:0 0 auto">{{ f.ageTxt }}</div>
+              <sc-if value="{{ f.hasDue }}" hint-placeholder-val="{{ false }}">
+                <span style="background:{{ f.dueBg }};color:{{ f.dueFg }};border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600;flex:0 0 auto">{{ f.dueTxt }}</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid #ECF1EF;font-size:15px;font-weight:700">Recent orders &amp; notices</div>
+          <sc-for list="{{ recentOrders }}" as="o" hint-placeholder-count="2">
+            <div sc-camel-on-click="{{ o.open }}" style="display:flex;align-items:center;gap:14px;padding:11px 18px;border-bottom:1px solid #F1F5F3;cursor:pointer" style-hover="background:#F6FAF8">
+              <span style="background:#EEF4F2;color:#3D544D;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;flex:0 0 auto">{{ o.type }}</span>
+              <div style="flex:1;font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.subject }}</div>
+              <div style="font-size:12px;color:#5F726C">{{ o.dateTxt }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isFiles }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Files" style="padding:28px 32px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div style="font-size:22px;font-weight:700">All files &amp; letters</div>
+          <button sc-camel-on-click="{{ openNewFile }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">+ New file / letter</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <input value="{{ q }}" sc-camel-on-change="{{ onQ }}" placeholder="Search subject or file no…" style="flex:1;min-width:220px;padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;outline:none;background:#FFFFFF" style-focus="border-color:#0F5C4A">
+          <sc-raw-select value="{{ fCat }}" sc-camel-on-change="{{ onFCat }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;background:#FFFFFF;cursor:pointer">
+            <option value="All">All categories</option>
+            <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3"><option value="{{ c.name }}">{{ c.name }}</option></sc-for>
+          </sc-raw-select>
+          <sc-raw-select value="{{ fStatus }}" sc-camel-on-change="{{ onFStatus }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;background:#FFFFFF;cursor:pointer">
+            <option value="All">All statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Disposed">Disposed</option>
+            <option value="Despatched">Despatched</option>
+          </sc-raw-select>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;overflow:hidden">
+          <div style="display:flex;gap:14px;padding:10px 18px;background:#F6FAF8;border-bottom:1px solid #DCE5E1;font-size:11.5px;font-weight:700;color:#5F726C;text-transform:uppercase;letter-spacing:0.5px">
+            <div style="flex:0 0 150px">File no.</div>
+            <div style="flex:1">Subject</div>
+            <div style="flex:0 0 130px">With</div>
+            <div style="flex:0 0 90px">Due</div>
+            <div style="flex:0 0 92px">Status</div>
+          </div>
+          <sc-for list="{{ fileRows }}" as="f" hint-placeholder-count="6">
+            <div sc-camel-on-click="{{ f.open }}" style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid #F1F5F3;cursor:pointer" style-hover="background:#F6FAF8">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#0F5C4A;font-weight:600;flex:0 0 150px">{{ f.no }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.subject }}</div>
+                <div style="font-size:12px;color:#5F726C;margin-top:1px">{{ f.typeCat }}</div>
+              </div>
+              <div style="flex:0 0 130px;font-size:12.5px;color:#3D544D">{{ f.holderName }}</div>
+              <div style="flex:0 0 90px;font-size:12px;color:{{ f.dueFg }};font-weight:600">{{ f.dueShort }}</div>
+              <div style="flex:0 0 92px"><span style="background:{{ f.stBg }};color:{{ f.stFg }};border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600">{{ f.status }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="File detail" style="padding:28px 32px;display:flex;flex-direction:column;gap:18px">
+        <button sc-camel-on-click="{{ goFiles }}" style="background:none;border:none;color:#0F5C4A;font-size:13px;font-weight:600;cursor:pointer;width:fit-content;padding:0">← Back to files</button>
+        <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
+          <div style="flex:2;min-width:340px;display:flex;flex-direction:column;gap:18px">
+            <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:22px 24px">
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+                <div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#0F5C4A;font-weight:600">{{ sel.no }}</div>
+                  <div style="font-size:19px;font-weight:700;margin-top:5px;max-width:560px">{{ sel.subject }}</div>
+                </div>
+                <span style="background:{{ sel.stBg }};color:{{ sel.stFg }};border-radius:100px;padding:5px 14px;font-size:12.5px;font-weight:700">{{ sel.status }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:18px">
+                <sc-for list="{{ selMeta }}" as="m" hint-placeholder-count="4">
+                  <div>
+                    <div style="font-size:11px;color:#5F726C;font-weight:700;text-transform:uppercase;letter-spacing:0.5px">{{ m.k }}</div>
+                    <div style="font-size:13.5px;font-weight:600;margin-top:3px;color:{{ m.color }}">{{ m.v }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:22px 24px">
+              <div style="font-size:15px;font-weight:700;margin-bottom:14px">Movement log</div>
+              <div style="display:flex;flex-direction:column;gap:0">
+                <sc-for list="{{ selMoves }}" as="m" hint-placeholder-count="3">
+                  <div style="display:flex;gap:14px">
+                    <div style="display:flex;flex-direction:column;align-items:center">
+                      <div style="width:10px;height:10px;border-radius:50%;background:{{ m.dot }};margin-top:5px;flex:0 0 auto"></div>
+                      <sc-if value="{{ m.notLast }}" hint-placeholder-val="{{ true }}"><div style="width:2px;flex:1;background:#DCE5E1;min-height:22px"></div></sc-if>
+                    </div>
+                    <div style="padding-bottom:18px;min-width:0">
+                      <div style="font-size:13.5px;font-weight:600">{{ m.line }}</div>
+                      <div style="font-size:12px;color:#5F726C;margin-top:2px">{{ m.dateTxt }}</div>
+                      <sc-if value="{{ m.note }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:13px;color:#3D544D;background:#F6FAF8;border:1px solid #E4EDE9;border-radius:8px;padding:8px 12px;margin-top:7px;max-width:520px">{{ m.note }}</div>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:22px 24px">
+              <div style="font-size:15px;font-weight:700;margin-bottom:12px">Attachments</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ selAtt }}" as="a" hint-placeholder-count="1">
+                  <div style="display:flex;align-items:center;gap:10px;border:1px solid #E4EDE9;border-radius:8px;padding:9px 14px">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:#EEF4F2;color:#0F5C4A;border-radius:5px;padding:2px 7px;font-weight:600">PDF</span>
+                    <sc-if value="{{ a.hasUrl }}" hint-placeholder-val="{{ false }}">
+                      <a href="{{ a.url }}" target="_blank" rel="noopener" style="font-size:13px;font-weight:500;flex:1;color:#0F5C4A;text-decoration:none" style-hover="text-decoration:underline">{{ a.name }} ↗</a>
+                    </sc-if>
+                    <sc-if value="{{ a.noUrl }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-size:13px;font-weight:500;flex:1">{{ a.name }}</span>
+                    </sc-if>
+                    <span style="font-size:12px;color:#5F726C">{{ a.by }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:12px">
+                <input value="{{ attName }}" sc-camel-on-change="{{ onAttName }}" placeholder="Document name, e.g. Scan of estimate" style="flex:1;padding:8px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none" style-focus="border-color:#0F5C4A">
+                <button sc-camel-on-click="{{ addAtt }}" style="background:#EEF4F2;color:#0F5C4A;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#DDEAE5">Attach scan</button>
+              </div>
+              <sc-if value="{{ canUpload }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
+                  <span style="font-size:12px;font-weight:600;color:#5F726C">Upload to Drive (max 10 MB):</span>
+                  <input type="file" sc-camel-on-change="{{ onAttFile }}" style="font-size:12.5px;color:#3D544D">
+                  <span style="font-size:12px;color:#9A6700">{{ attUpMsg }}</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:18px">
+            <sc-if value="{{ sel.actionable }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:20px 22px">
+                <div style="font-size:15px;font-weight:700;margin-bottom:12px">Forward file</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-raw-select value="{{ fwdTo }}" sc-camel-on-change="{{ onFwdTo }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;background:#FFFFFF;cursor:pointer;width:100%">
+                    <option value="">Select officer…</option>
+                    <sc-for list="{{ fwdUsers }}" as="u" hint-placeholder-count="4"><option value="{{ u.id }}">{{ u.label }}</option></sc-for>
+                  </sc-raw-select>
+                  <textarea value="{{ fwdNote }}" sc-camel-on-change="{{ onFwdNote }}" placeholder="Note (optional) — e.g. Please prepare estimate and put up." rows="3" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;outline:none;resize:vertical;width:100%" style-focus="border-color:#0F5C4A"></textarea>
+                  <div>
+                    <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">Due date (optional)</div>
+                    <input type="date" value="{{ fwdDue }}" sc-camel-on-change="{{ onFwdDue }}" style="padding:8px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;width:100%;outline:none">
+                  </div>
+                  <button sc-camel-on-click="{{ doForward }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">Forward →</button>
+                </div>
+                <div style="border-top:1px solid #ECF1EF;margin-top:16px;padding-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+                  <button sc-camel-on-click="{{ doDispose }}" style="background:#FFFFFF;color:#3D544D;border:1px solid #C7D4CF;border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;flex:1" style-hover="background:#F6FAF8">Dispose (close)</button>
+                  <button sc-camel-on-click="{{ doDespatch }}" style="background:#FFFFFF;color:#3D544D;border:1px solid #C7D4CF;border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;flex:1" style-hover="background:#F6FAF8">Despatch out</button>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sel.closed }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#F6FAF8;border:1px solid #DCE5E1;border-radius:10px;padding:18px 20px;font-size:13px;color:#3D544D">This file is {{ sel.statusLower }}. No further movement. <button sc-camel-on-click="{{ doReopen }}" style="background:none;border:none;color:#0F5C4A;font-weight:600;cursor:pointer;font-size:13px;padding:0">Reopen</button></div>
+            </sc-if>
+            <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:20px 22px">
+              <div style="font-size:15px;font-weight:700;margin-bottom:10px">APP linkage</div>
+              <div style="font-size:12.5px;color:#5F726C;margin-bottom:10px">Link this file to a package in the Annual Procurement Plan.</div>
+              <sc-raw-select value="{{ sel.appId }}" sc-camel-on-change="{{ linkApp }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;background:#FFFFFF;cursor:pointer;width:100%">
+                <option value="">— Not linked —</option>
+                <sc-for list="{{ appOptions }}" as="p" hint-placeholder-count="2"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
+              </sc-raw-select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isReg }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Registers" style="padding:28px 32px;display:flex;flex-direction:column;gap:18px">
+        <div style="font-size:22px;font-weight:700">Registers</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ regTabs }}" as="t" hint-placeholder-count="5">
+            <button sc-camel-on-click="{{ t.go }}" style="background:{{ t.bg }};color:{{ t.fg }};border:1px solid {{ t.bd }};border-radius:100px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#0F5C4A">{{ t.label }}</button>
+          </sc-for>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;overflow:auto">
+          <div style="min-width:760px">
+            <div style="display:flex;gap:14px;padding:10px 18px;background:#F6FAF8;border-bottom:1px solid #DCE5E1;font-size:11.5px;font-weight:700;color:#5F726C;text-transform:uppercase;letter-spacing:0.5px">
+              <sc-for list="{{ regCols }}" as="c" hint-placeholder-count="5"><div style="flex:{{ c.flex }};min-width:0">{{ c.label }}</div></sc-for>
+            </div>
+            <sc-for list="{{ regRows }}" as="r" hint-placeholder-count="6">
+              <div sc-camel-on-click="{{ r.open }}" style="display:flex;gap:14px;padding:11px 18px;border-bottom:1px solid #F1F5F3;cursor:pointer;align-items:center" style-hover="background:#F6FAF8">
+                <sc-for list="{{ r.cells }}" as="c">
+                  <div style="flex:{{ c.flex }};min-width:0;font-size:12.5px;color:{{ c.color }};font-weight:{{ c.w }};font-family:{{ c.font }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.v }}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+            <sc-if value="{{ regEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:32px;text-align:center;color:#5F726C;font-size:13.5px">No entries in this register.</div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Annual Procurement Plan" style="padding:28px 32px;display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:22px;font-weight:700">Annual Procurement Plan</div>
+            <div style="font-size:13.5px;color:#5F726C;margin-top:3px">FY 2026–27 · Civil Works, P&amp;D, WZPDCL</div>
+          </div>
+          <button sc-camel-on-click="{{ toggleAppForm }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">+ Add package</button>
+        </div>
+        <sc-if value="{{ appFormOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:14.5px;font-weight:700">New APP package</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+              <input value="{{ apPkg }}" sc-camel-on-change="{{ onApPkg }}" placeholder="Package no. e.g. CW-W-05" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none" style-focus="border-color:#0F5C4A">
+              <input value="{{ apEst }}" sc-camel-on-change="{{ onApEst }}" placeholder="Estimated cost, e.g. Tk 25.0 Lakh" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none" style-focus="border-color:#0F5C4A">
+              <sc-raw-select value="{{ apMethod }}" sc-camel-on-change="{{ onApMethod }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;background:#FFFFFF;cursor:pointer">
+                <option value="OTM">OTM</option><option value="LTM">LTM</option><option value="RFQ">RFQ</option><option value="DPM">DPM</option>
+              </sc-raw-select>
+              <sc-raw-select value="{{ apQtr }}" sc-camel-on-change="{{ onApQtr }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;background:#FFFFFF;cursor:pointer">
+                <option value="Q1">Q1 (Jul–Sep)</option><option value="Q2">Q2 (Oct–Dec)</option><option value="Q3">Q3 (Jan–Mar)</option><option value="Q4">Q4 (Apr–Jun)</option>
+              </sc-raw-select>
+            </div>
+            <input value="{{ apDesc }}" sc-camel-on-change="{{ onApDesc }}" placeholder="Description of work / goods" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;width:100%" style-focus="border-color:#0F5C4A">
+            <div style="display:flex;gap:8px">
+              <button sc-camel-on-click="{{ addAppItem }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">Save package</button>
+              <button sc-camel-on-click="{{ toggleAppForm }}" style="background:#FFFFFF;color:#3D544D;border:1px solid #C7D4CF;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ appRows }}" as="p" hint-placeholder-count="3">
+            <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:18px 22px">
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+                <div style="min-width:0">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#0F5C4A;font-weight:700">{{ p.pkg }}</span>
+                    <span style="background:#EEF4F2;color:#3D544D;border-radius:100px;padding:2px 10px;font-size:11px;font-weight:700">{{ p.method }}</span>
+                    <span style="background:#EEF4F2;color:#3D544D;border-radius:100px;padding:2px 10px;font-size:11px;font-weight:700">{{ p.qtr }}</span>
+                    <span style="background:{{ p.stBg }};color:{{ p.stFg }};border-radius:100px;padding:2px 10px;font-size:11px;font-weight:700">{{ p.status }}</span>
+                  </div>
+                  <div style="font-size:14.5px;font-weight:600;margin-top:7px">{{ p.desc }}</div>
+                  <div style="font-size:12.5px;color:#5F726C;margin-top:3px">Estimated cost: {{ p.est }}</div>
+                </div>
+                <button sc-camel-on-click="{{ p.advance }}" style="background:#FFFFFF;color:#0F5C4A;border:1px solid #C7D4CF;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;flex:0 0 auto" style-hover="border-color:#0F5C4A">{{ p.nextLabel }}</button>
+              </div>
+              <sc-if value="{{ p.hasFiles }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid #ECF1EF;margin-top:14px;padding-top:12px">
+                  <div style="font-size:11.5px;font-weight:700;color:#5F726C;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Linked files</div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <sc-for list="{{ p.files }}" as="f">
+                      <div sc-camel-on-click="{{ f.open }}" style="display:flex;gap:12px;align-items:center;cursor:pointer;padding:6px 10px;border-radius:7px" style-hover="background:#F6FAF8">
+                        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#0F5C4A;font-weight:600">{{ f.no }}</span>
+                        <span style="font-size:12.5px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.subject }}</span>
+                        <span style="background:{{ f.stBg }};color:{{ f.stFg }};border-radius:100px;padding:2px 9px;font-size:10.5px;font-weight:700">{{ f.status }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Administration" style="padding:28px 32px;display:flex;flex-direction:column;gap:20px">
+        <div style="font-size:22px;font-weight:700">Administration</div>
+        <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:22px 24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+            <div style="font-size:15px;font-weight:700">Organogram &amp; user accounts</div>
+            <button sc-camel-on-click="{{ toggleUserForm }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">+ Add user</button>
+          </div>
+          <sc-if value="{{ userFormOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#F6FAF8;border:1px solid #DCE5E1;border-radius:10px;padding:16px 18px;margin-bottom:18px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px">
+                <input value="{{ nuName }}" sc-camel-on-change="{{ onNuName }}" placeholder="Full name" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;background:#FFFFFF" style-focus="border-color:#0F5C4A">
+                <sc-raw-select value="{{ nuRole }}" sc-camel-on-change="{{ onNuRole }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;background:#FFFFFF;cursor:pointer">
+                  <option value="XEN">XEN</option><option value="SDE">SDE</option><option value="AE">AE</option><option value="SAE">SAE</option><option value="Staff">Office Staff</option>
+                </sc-raw-select>
+                <sc-raw-select value="{{ nuRep }}" sc-camel-on-change="{{ onNuRep }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;background:#FFFFFF;cursor:pointer">
+                  <option value="">Reports to…</option>
+                  <sc-for list="{{ allOfficers }}" as="u"><option value="{{ u.id }}">{{ u.label }}</option></sc-for>
+                </sc-raw-select>
+                <input value="{{ nuId }}" sc-camel-on-change="{{ onNuId }}" placeholder="User ID e.g. sde5" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;background:#FFFFFF" style-focus="border-color:#0F5C4A">
+                <input value="{{ nuPass }}" sc-camel-on-change="{{ onNuPass }}" placeholder="Password" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;background:#FFFFFF" style-focus="border-color:#0F5C4A">
+              </div>
+              <sc-if value="{{ nuErr }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#FDECEA;color:#B42318;font-size:12.5px;padding:8px 12px;border-radius:8px">{{ nuErr }}</div>
+              </sc-if>
+              <div style="display:flex;gap:8px">
+                <button sc-camel-on-click="{{ addUser }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">{{ nuBtnLabel }}</button>
+                <button sc-camel-on-click="{{ toggleUserForm }}" style="background:#FFFFFF;color:#3D544D;border:1px solid #C7D4CF;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+              </div>
+            </div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <sc-for list="{{ orgTiers }}" as="t" hint-placeholder-count="4">
+              <div>
+                <div style="font-size:11.5px;font-weight:700;color:#5F726C;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">{{ t.label }}</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px">
+                  <sc-for list="{{ t.users }}" as="u">
+                    <div style="border:1px solid #DCE5E1;border-radius:10px;padding:13px 15px;background:#FDFEFE">
+                      <div style="font-size:13.5px;font-weight:700">{{ u.name }}</div>
+                      <div style="font-size:12px;color:#5F726C;margin-top:1px">{{ u.desig }}</div>
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#3D544D;margin-top:7px">ID: {{ u.id }}{{ u.pwTxt }}</div>
+                      <div style="font-size:11.5px;color:#5F726C;margin-top:3px">Reports to: {{ u.repName }}</div>
+                      <div style="display:flex;gap:6px;margin-top:9px">
+                        <button sc-camel-on-click="{{ u.reset }}" style="background:#EEF4F2;color:#0F5C4A;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer" style-hover="background:#DDEAE5">Reset PW</button>
+                        <sc-if value="{{ u.removable }}" hint-placeholder-val="{{ false }}">
+                          <button sc-camel-on-click="{{ u.remove }}" style="background:#FDECEA;color:#B42318;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer" style-hover="background:#FADBD7">Remove</button>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:22px 24px">
+          <div style="font-size:15px;font-weight:700;margin-bottom:4px">File categories</div>
+          <div style="font-size:12.5px;color:#5F726C;margin-bottom:14px">Categories are creatable — new ones appear in the New File form and filters.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <sc-for list="{{ catRows }}" as="c" hint-placeholder-count="4">
+              <span style="display:inline-flex;align-items:center;gap:8px;background:#EEF4F2;border-radius:100px;padding:6px 8px 6px 14px;font-size:12.5px;font-weight:600;color:#0F5C4A">{{ c.name }}
+                <button sc-camel-on-click="{{ c.remove }}" style="background:rgba(15,92,74,0.12);border:none;border-radius:50%;width:18px;height:18px;font-size:11px;color:#0F5C4A;cursor:pointer;line-height:1">×</button>
+              </span>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;max-width:420px">
+            <input value="{{ newCat }}" sc-camel-on-change="{{ onNewCat }}" placeholder="New category name" style="flex:1;padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none" style-focus="border-color:#0F5C4A">
+            <button sc-camel-on-click="{{ addCat }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">Add</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+<sc-if value="{{ nfOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(10,30,25,0.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px">
+    <div style="background:#FFFFFF;border-radius:14px;padding:28px 30px;width:560px;max-width:100%;max-height:90vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,0.35)">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">New file / letter</div>
+      <div style="font-size:12.5px;color:#5F726C;margin-bottom:18px">A file number and register entry will be generated automatically.</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">Type</div>
+            <sc-raw-select value="{{ nfType }}" sc-camel-on-change="{{ onNfType }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;background:#FFFFFF;cursor:pointer;width:100%">
+              <option value="Incoming">Incoming letter / file</option>
+              <option value="Outgoing">Outgoing letter</option>
+              <option value="Note">Office note / noting</option>
+              <option value="Order">Office order</option>
+              <option value="Notice">Notice / circular</option>
+              <option value="Self">Self-initiated file</option>
+            </sc-raw-select>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">Category</div>
+            <sc-raw-select value="{{ nfCat }}" sc-camel-on-change="{{ onNfCat }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;background:#FFFFFF;cursor:pointer;width:100%">
+              <sc-for list="{{ cats }}" as="c"><option value="{{ c.name }}">{{ c.name }}</option></sc-for>
+            </sc-raw-select>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">Subject</div>
+          <input value="{{ nfSubject }}" sc-camel-on-change="{{ onNfSubject }}" placeholder="Subject of the file / letter" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;width:100%" style-focus="border-color:#0F5C4A">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">From / addressed to</div>
+            <input value="{{ nfSource }}" sc-camel-on-change="{{ onNfSource }}" placeholder="e.g. GM Office, WZPDCL" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;width:100%" style-focus="border-color:#0F5C4A">
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">Due date (optional)</div>
+            <input type="date" value="{{ nfDue }}" sc-camel-on-change="{{ onNfDue }}" style="padding:8px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;width:100%;outline:none">
+          </div>
+        </div>
+        <sc-if value="{{ nfErr }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FDECEA;color:#B42318;font-size:12.5px;padding:8px 12px;border-radius:8px">{{ nfErr }}</div>
+        </sc-if>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button sc-camel-on-click="{{ createFile }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">{{ nfBtnLabel }}</button>
+          <button sc-camel-on-click="{{ closeNewFile }}" style="background:#FFFFFF;color:#3D544D;border:1px solid #C7D4CF;border-radius:8px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ cpOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(10,30,25,0.55);display:flex;align-items:center;justify-content:center;z-index:60;padding:20px">
+    <div style="background:#FFFFFF;border-radius:14px;padding:28px 30px;width:420px;max-width:100%;box-shadow:0 30px 80px rgba(0,0,0,0.35)">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">{{ cpTitle }}</div>
+      <div style="font-size:12.5px;color:#5F726C;margin-bottom:18px">{{ cpIntro }}</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">Current password</div>
+          <input type="password" value="{{ cpOld }}" sc-camel-on-change="{{ onCpOld }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;width:100%" style-focus="border-color:#0F5C4A">
+        </div>
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">New password</div>
+          <input type="password" value="{{ cpNew }}" sc-camel-on-change="{{ onCpNew }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;width:100%" style-focus="border-color:#0F5C4A">
+        </div>
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:#5F726C;margin-bottom:4px">Confirm new password</div>
+          <input type="password" value="{{ cpNew2 }}" sc-camel-on-change="{{ onCpNew2 }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;width:100%" style-focus="border-color:#0F5C4A">
+        </div>
+        <sc-if value="{{ cpErr }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FDECEA;color:#B42318;font-size:12.5px;padding:8px 12px;border-radius:8px">{{ cpErr }}</div>
+        </sc-if>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button sc-camel-on-click="{{ doChangePass }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">{{ cpBtnLabel }}</button>
+          <sc-if value="{{ cpCancelable }}" hint-placeholder-val="{{ false }}">
+            <button sc-camel-on-click="{{ closeChangePass }}" style="background:#FFFFFF;color:#3D544D;border:1px solid #C7D4CF;border-radius:8px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ syncShow }}" hint-placeholder-val="{{ false }}">
+  <div sc-camel-on-click="{{ syncRetry }}" style="position:fixed;right:18px;bottom:18px;z-index:70;background:{{ syncBg }};color:{{ syncFg }};border-radius:100px;padding:8px 16px;font-size:12.5px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,0.18);cursor:pointer;max-width:420px">{{ syncLabel }}</div>
+</sc-if>
+
+<sc-if value="{{ demoMode }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:18px;bottom:18px;z-index:70;background:#FFF6E6;color:#9A6700;border:1px solid #F2E2BE;border-radius:100px;padding:7px 14px;font-size:12px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,0.12)">Demo mode — data resets on reload</div>
+</sc-if>
+
+</sc-if></x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;showCredentials&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Prototype&quot;}}">
+/* ================= CONFIG =================
+ * Paste your Google Apps Script Web App URL (ends in /exec) between the quotes
+ * to go LIVE. Leave empty ('') for DEMO mode: sample data, resets on reload.
+ * See SETUP.md for the full setup guide.
+ */
+const API_URL = '';
+
+const DEMO = !API_URL;
+const LS_TOKEN = 'cwdms_token', LS_USER = 'cwdms_user';
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const U = (id, pass, name, desig, role, reportsTo) => ({ id, pass, name, desig, role, reportsTo });
+    const users = [
+      U('admin', 'admin123', 'System Administrator', 'Admin, Civil Works DMS', 'Admin', ''),
+      U('xen', '1234', 'Engr. Md. Shafiqul Alam', 'Executive Engineer (XEN)', 'XEN', ''),
+      U('sde1', '1234', 'Md. Kamrul Hasan', 'Sub-Divisional Engineer', 'SDE', 'xen'),
+      U('sde2', '1234', 'Sharmin Akter', 'Sub-Divisional Engineer', 'SDE', 'xen'),
+      U('sde3', '1234', 'Md. Abu Sayeed', 'Sub-Divisional Engineer', 'SDE', 'xen'),
+      U('sde4', '1234', 'Tanvir Ahmed', 'Sub-Divisional Engineer', 'SDE', 'xen'),
+      U('ae1', '1234', 'Farzana Yasmin', 'Assistant Engineer', 'AE', 'sde1'),
+      U('ae2', '1234', 'Md. Rakibul Islam', 'Assistant Engineer', 'AE', 'sde2'),
+      U('ae3', '1234', 'Nusrat Jahan', 'Assistant Engineer', 'AE', 'sde3'),
+      U('sae1', '1234', 'Md. Alamgir Hossain', 'Sub-Assistant Engineer', 'SAE', 'ae1'),
+      U('sae2', '1234', 'Shakil Ahmed', 'Sub-Assistant Engineer', 'SAE', 'ae2'),
+      U('sae3', '1234', 'Md. Jahid Hasan', 'Sub-Assistant Engineer', 'SAE', 'ae3'),
+    ];
+    const M = (from, to, date, note) => ({ from, to, date, note: note || '' });
+    const files = [
+      { id: 1, no: 'WZPDCL/CW/2026/041', inNo: 'IN-2026-118', outNo: '', type: 'Incoming', cat: 'Repair & Maintenance', subject: 'Repair of boundary wall, Khulna S&D office premises', source: 'GM Office, WZPDCL', created: '2026-07-12', due: '2026-07-20', status: 'Pending', holder: 'ae1', appId: '', att: [{ name: 'Letter from GM Office.pdf', by: 'xen' }],
+        moves: [M('GM Office, WZPDCL', 'xen', '2026-07-12', 'Received by DAK.'), M('xen', 'sde1', '2026-07-13', 'Please examine and put up estimate.'), M('sde1', 'ae1', '2026-07-14', 'Prepare estimate with site measurement.')] },
+      { id: 2, no: 'WZPDCL/CW/2026/042', inNo: 'IN-2026-119', outNo: '', type: 'Incoming', cat: 'Estimates & Bills', subject: 'Approval of civil works estimate — 33/11kV substation boundary development', source: 'PD, Khulna Division', created: '2026-07-08', due: '2026-07-14', status: 'Pending', holder: 'sde2', appId: 'p1', att: [],
+        moves: [M('PD, Khulna Division', 'xen', '2026-07-08', 'Received.'), M('xen', 'sde2', '2026-07-09', 'Check rates against latest schedule.')] },
+      { id: 3, no: 'WZPDCL/CW/2026/043', inNo: '', outNo: '', type: 'Self', cat: 'Repair & Maintenance', subject: 'Annual maintenance plan for pump houses and deep tube wells', source: 'Civil Works (self-initiated)', created: '2026-07-10', due: '2026-07-25', status: 'Pending', holder: 'sae2', appId: '', att: [],
+        moves: [M('sde2', 'ae2', '2026-07-10', 'Initiated. Survey all pump houses.'), M('ae2', 'sae2', '2026-07-11', 'Collect condition data, site-wise.')] },
+      { id: 4, no: 'WZPDCL/CW/2026/037', inNo: '', outNo: '', type: 'Order', cat: 'Administration', subject: 'Office Order: Duty roster during Eid-ul-Azha holidays', source: 'XEN, Civil Works', created: '2026-06-28', due: '', status: 'Disposed', holder: 'xen', appId: '', att: [{ name: 'Signed office order.pdf', by: 'xen' }],
+        moves: [M('xen', 'xen', '2026-06-28', 'Issued and circulated to all staff.')] },
+      { id: 5, no: 'WZPDCL/CW/2026/039', inNo: '', outNo: 'OUT-2026-064', type: 'Notice', cat: 'Administration', subject: 'Notice: Submission of APP proposals for FY 2026-27', source: 'XEN, Civil Works', created: '2026-07-02', due: '', status: 'Despatched', holder: 'xen', appId: '', att: [],
+        moves: [M('xen', 'All sections', '2026-07-02', 'Circulated. Proposals due 15 Jul.')] },
+      { id: 6, no: 'WZPDCL/CW/2026/040', inNo: '', outNo: 'OUT-2026-063', type: 'Outgoing', cat: 'Estimates & Bills', subject: 'Letter to PD, Khulna regarding land development bill adjustment', source: 'PD, Khulna Division', created: '2026-07-06', due: '', status: 'Despatched', holder: 'xen', appId: '', att: [{ name: 'Bill statement.pdf', by: 'sde3' }],
+        moves: [M('sde3', 'xen', '2026-07-07', 'Draft put up for signature.'), M('xen', 'Despatch', '2026-07-10', 'Signed and despatched.')] },
+      { id: 7, no: 'WZPDCL/CW/2026/044', inNo: 'IN-2026-121', outNo: '', type: 'Incoming', cat: 'Tender & Procurement', subject: 'Tender evaluation report — Package CW-W-03 (office building renovation)', source: 'Tender Evaluation Committee', created: '2026-07-13', due: '2026-07-18', status: 'Pending', holder: 'xen', appId: 'p2', att: [{ name: 'TEC report.pdf', by: 'sde4' }],
+        moves: [M('Tender Evaluation Committee', 'sde4', '2026-07-13', 'TEC report received.'), M('sde4', 'xen', '2026-07-14', 'Put up for approval.')] },
+      { id: 8, no: 'WZPDCL/CW/2026/045', inNo: '', outNo: '', type: 'Note', cat: 'Administration', subject: 'Noting: Sanction for repair of departmental vehicle (Khulna Metro-GA-11-0245)', source: 'Civil Works (self-initiated)', created: '2026-07-14', due: '2026-07-22', status: 'Pending', holder: 'ae3', appId: '', att: [],
+        moves: [M('sae3', 'ae3', '2026-07-14', 'Workshop quotation enclosed. Please put up.')] },
+    ];
+    const appItems = [
+      { id: 'p1', pkg: 'CW-W-01', desc: 'Boundary development & civil works of 33/11kV substations (4 nos.)', method: 'OTM', est: 'Tk 85.0 Lakh', qtr: 'Q1', status: 'Approved' },
+      { id: 'p2', pkg: 'CW-W-03', desc: 'Renovation of office building, Civil Works division', method: 'OTM', est: 'Tk 42.5 Lakh', qtr: 'Q2', status: 'Tendered' },
+      { id: 'p3', pkg: 'CW-G-02', desc: 'Procurement of construction materials (cement, rod, bricks)', method: 'LTM', est: 'Tk 18.0 Lakh', qtr: 'Q1', status: 'Planned' },
+    ];
+    this.token = DEMO ? null : (localStorage.getItem(LS_TOKEN) || null);
+    let savedUser = null;
+    if (this.token) { try { savedUser = JSON.parse(localStorage.getItem(LS_USER) || 'null'); } catch (e) { savedUser = null; } }
+    this.state = {
+      user: DEMO ? null : savedUser, view: 'dashboard', selId: null,
+      users: DEMO ? users : (savedUser ? [savedUser] : []),
+      files: DEMO ? files : [],
+      appItems: DEMO ? appItems : [],
+      cats: ['Repair & Maintenance', 'Estimates & Bills', 'Tender & Procurement', 'Administration', 'Correspondence'],
+      booting: !DEMO && !!this.token,
+      loggingIn: false, sync: 'idle', syncMsg: '',
+      cpOpen: false, cpForced: false, cpOld: '', cpNew: '', cpNew2: '', cpErr: '', cpBusy: false,
+      loginId: '', loginPass: '', loginErr: '',
+      q: '', fCat: 'All', fStatus: 'All', regTab: 'inward',
+      nfOpen: false, nfType: 'Incoming', nfCat: 'Correspondence', nfSubject: '', nfSource: '', nfDue: '', nfErr: '', nfBusy: false,
+      fwdTo: '', fwdNote: '', fwdDue: '', attName: '', attUpMsg: '',
+      appFormOpen: false, apPkg: '', apDesc: '', apMethod: 'OTM', apEst: '', apQtr: 'Q1', apBusy: false,
+      userFormOpen: false, nuName: '', nuRole: 'SAE', nuRep: '', nuId: '', nuPass: '', nuErr: '', nuBusy: false, newCat: '',
+      seq: 46, inSeq: 122, outSeq: 65,
+    };
+  }
+  componentDidMount() { if (!DEMO && this.token) this.loadAll(true); }
+
+  // ---------- backend helpers ----------
+  api(action, payload) {
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ action: action, token: this.token }, payload || {})),
+    }).then(r => r.json()).then(res => {
+      if (!res.ok && res.code === 'AUTH') this.clearSession('Session expired. Please sign in again.');
+      return res;
+    });
+  }
+  clearSession(msg) {
+    this.token = null;
+    localStorage.removeItem(LS_TOKEN); localStorage.removeItem(LS_USER);
+    this.setState({ user: null, users: [], files: [], appItems: [], booting: false, loggingIn: false, view: 'dashboard', loginErr: msg || '', cpOpen: false, cpForced: false, sync: 'idle', syncMsg: '' });
+  }
+  loadAll(fromBoot) {
+    return this.api('load').then(res => {
+      if (res.ok) this.setState({ user: res.user, users: res.users, files: res.files, appItems: res.appItems, cats: res.cats, booting: false });
+      else if (!res.code) this.setState({ booting: false, sync: 'error', syncMsg: res.error || 'Could not load data.' });
+    }).catch(() => {
+      if (fromBoot) this.clearSession('Could not reach the server. Please sign in again.');
+      else this.setState({ sync: 'error', syncMsg: 'Network error — could not load data.' });
+    });
+  }
+  flashSaved(msg) {
+    this.setState({ sync: 'saved', syncMsg: msg || 'Saved' });
+    clearTimeout(this._syncT);
+    this._syncT = setTimeout(() => this.setState(s => (s.sync === 'saved' ? { sync: 'idle', syncMsg: '' } : null)), 2500);
+  }
+  saveOp(action, payload, reconcile, savedMsg) {
+    if (DEMO) return Promise.resolve({ ok: true });
+    this.setState({ sync: 'saving', syncMsg: 'Saving…' });
+    return this.api(action, payload).then(res => {
+      if (res.ok) { if (reconcile) reconcile(res); this.flashSaved(savedMsg); }
+      else if (!res.code) this.setState({ sync: 'error', syncMsg: res.error || 'Save failed.' });
+      return res;
+    }).catch(() => { this.setState({ sync: 'error', syncMsg: 'Network error — change may not be saved.' }); return { ok: false }; });
+  }
+  putFile(file) { this.setState(s => ({ files: s.files.map(f => f.id === file.id ? file : f) })); }
+
+  // ---------- misc helpers ----------
+  uName(id) { const u = this.state.users.find(u => u.id === id); return u ? u.name : id; }
+  uLabel(id) { const u = this.state.users.find(u => u.id === id); return u ? u.name + ' — ' + u.desig : id; }
+  fmt(iso) { if (!iso) return '—'; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  today() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dhaka' }).format(new Date()); }
+  days(iso) { return Math.round((new Date(this.today()) - new Date(iso)) / 86400000); }
+  set(k) { return (e) => this.setState({ [k]: e.target.value }); }
+  stColors(st, overdue) {
+    if (st === 'Pending') return overdue ? { bg: '#FDECEA', fg: '#B42318' } : { bg: '#FFF6E6', fg: '#9A6700' };
+    if (st === 'Disposed') return { bg: '#E7F2EE', fg: '#0F5C4A' };
+    return { bg: '#EAF0F6', fg: '#33547A' };
+  }
+  decorate(f) {
+    const overdue = f.status === 'Pending' && f.due && f.due < this.today();
+    const st = this.stColors(f.status, overdue);
+    const last = f.moves[f.moves.length - 1];
+    return {
+      ...f, overdue,
+      typeCat: f.type + ' · ' + f.cat,
+      holderName: f.status === 'Pending' ? this.uName(f.holder) : '—',
+      lastFrom: last ? this.uName(last.from) : f.source,
+      ageTxt: this.days(f.created) + 'd old',
+      hasDue: !!f.due && f.status === 'Pending',
+      dueTxt: overdue ? 'Overdue · ' + this.fmt(f.due) : 'Due ' + this.fmt(f.due),
+      dueShort: f.due && f.status === 'Pending' ? this.fmt(f.due).slice(0, 6) : '—',
+      dueBg: overdue ? '#FDECEA' : '#FFF6E6', dueFg: overdue ? '#B42318' : (f.due && f.status === 'Pending' ? '#9A6700' : '#5F726C'),
+      stBg: st.bg, stFg: st.fg,
+      open: () => this.setState({ view: 'detail', selId: f.id, fwdTo: '', fwdNote: '', fwdDue: '', attName: '', attUpMsg: '' }),
+    };
+  }
+  mutFile(id, fn) { this.setState(s => ({ files: s.files.map(f => f.id === id ? fn({ ...f }) : f) })); }
+
+  renderVals() {
+    const s = this.state, me = s.user;
+    const showCreds = DEMO && (this.props.showCredentials ?? true);
+    if (s.booting) {
+      return { booting: true, loggedOut: false, loggedIn: false, showCreds: false };
+    }
+    if (!me) {
+      return {
+        booting: false, loggedOut: true, loggedIn: false, showCreds,
+        loginId: s.loginId, loginPass: s.loginPass, loginErr: s.loginErr,
+        loginBtnLabel: s.loggingIn ? 'Signing in…' : 'Sign in',
+        onLoginId: this.set('loginId'), onLoginPass: this.set('loginPass'),
+        onLoginKey: (e) => { if (e.key === 'Enter') this.doLogin(); },
+        doLogin: () => this.doLogin(),
+        credChips: DEMO ? s.users.map(u => ({ label: u.id + ' / ' + u.pass, fill: () => this.setState({ loginId: u.id, loginPass: u.pass, loginErr: '' }) })) : [],
+      };
+    }
+    const isAdminUser = me.role === 'Admin';
+    const decorated = s.files.map(f => this.decorate(f));
+    const inbox = decorated.filter(f => f.status === 'Pending' && (f.holder === me.id || isAdminUser));
+    const overdueCount = inbox.filter(f => f.overdue).length;
+    const deptPending = decorated.filter(f => f.status === 'Pending').length;
+    const nav = [
+      ['dashboard', 'Dashboard', inbox.length], ['files', 'Files & Letters', 0], ['registers', 'Registers', 0], ['app', 'Procurement Plan', 0],
+    ];
+    if (isAdminUser || me.role === 'XEN') nav.push(['admin', 'Administration', 0]);
+    const viewKey = s.view === 'detail' ? 'files' : s.view;
+    const q = s.q.toLowerCase();
+    const fileRows = decorated.filter(f =>
+      (s.fCat === 'All' || f.cat === s.fCat) && (s.fStatus === 'All' || f.status === s.fStatus) &&
+      (!q || f.subject.toLowerCase().includes(q) || f.no.toLowerCase().includes(q))
+    ).sort((a, b) => b.created.localeCompare(a.created));
+    // registers
+    const C = (v, o) => ({ v, flex: (o && o.flex) || '1', color: (o && o.color) || '#1A2E29', w: (o && o.w) || '400', font: (o && o.mono) ? "'IBM Plex Mono',monospace" : "'IBM Plex Sans',sans-serif" });
+    let regCols = [], regRows = [];
+    if (s.regTab === 'inward') {
+      regCols = [{ label: 'Receipt no.', flex: '0 0 110px' }, { label: 'Date', flex: '0 0 100px' }, { label: 'From', flex: '0 0 180px' }, { label: 'Subject', flex: '1' }, { label: 'File no.', flex: '0 0 160px' }];
+      regRows = decorated.filter(f => f.inNo).map(f => ({ open: f.open, cells: [C(f.inNo, { flex: '0 0 110px', mono: true, color: '#0F5C4A', w: '600' }), C(this.fmt(f.created), { flex: '0 0 100px' }), C(f.source, { flex: '0 0 180px' }), C(f.subject, { w: '600' }), C(f.no, { flex: '0 0 160px', mono: true })] }));
+    } else if (s.regTab === 'outward') {
+      regCols = [{ label: 'Despatch no.', flex: '0 0 110px' }, { label: 'Date', flex: '0 0 100px' }, { label: 'To', flex: '0 0 180px' }, { label: 'Subject', flex: '1' }, { label: 'File no.', flex: '0 0 160px' }];
+      regRows = decorated.filter(f => f.outNo).map(f => ({ open: f.open, cells: [C(f.outNo, { flex: '0 0 110px', mono: true, color: '#0F5C4A', w: '600' }), C(this.fmt(f.moves[f.moves.length - 1].date), { flex: '0 0 100px' }), C(f.source, { flex: '0 0 180px' }), C(f.subject, { w: '600' }), C(f.no, { flex: '0 0 160px', mono: true })] }));
+    } else if (s.regTab === 'movement') {
+      regCols = [{ label: 'Date', flex: '0 0 100px' }, { label: 'File no.', flex: '0 0 160px' }, { label: 'From', flex: '0 0 150px' }, { label: 'To', flex: '0 0 150px' }, { label: 'Note', flex: '1' }];
+      regRows = decorated.flatMap(f => f.moves.map(m => ({ f, m }))).sort((a, b) => b.m.date.localeCompare(a.m.date))
+        .map(({ f, m }) => ({ open: f.open, cells: [C(this.fmt(m.date), { flex: '0 0 100px' }), C(f.no, { flex: '0 0 160px', mono: true, color: '#0F5C4A', w: '600' }), C(this.uName(m.from), { flex: '0 0 150px' }), C(this.uName(m.to), { flex: '0 0 150px' }), C(m.note || '—', { color: '#5F726C' })] }));
+    } else if (s.regTab === 'orders') {
+      regCols = [{ label: 'Date', flex: '0 0 100px' }, { label: 'Type', flex: '0 0 80px' }, { label: 'Subject', flex: '1' }, { label: 'File no.', flex: '0 0 160px' }, { label: 'Status', flex: '0 0 90px' }];
+      regRows = decorated.filter(f => f.type === 'Order' || f.type === 'Notice').map(f => ({ open: f.open, cells: [C(this.fmt(f.created), { flex: '0 0 100px' }), C(f.type, { flex: '0 0 80px', w: '600' }), C(f.subject, { w: '600' }), C(f.no, { flex: '0 0 160px', mono: true }), C(f.status, { flex: '0 0 90px', color: f.stFg, w: '600' })] }));
+    } else {
+      regCols = [{ label: 'File no.', flex: '0 0 160px' }, { label: 'Subject', flex: '1' }, { label: 'With', flex: '0 0 150px' }, { label: 'Pending', flex: '0 0 80px' }, { label: 'Due', flex: '0 0 120px' }];
+      regRows = decorated.filter(f => f.status === 'Pending').sort((a, b) => a.created.localeCompare(b.created))
+        .map(f => ({ open: f.open, cells: [C(f.no, { flex: '0 0 160px', mono: true, color: '#0F5C4A', w: '600' }), C(f.subject, { w: '600' }), C(f.holderName, { flex: '0 0 150px' }), C(this.days(f.created) + ' days', { flex: '0 0 80px', color: this.days(f.created) > 5 ? '#B42318' : '#1A2E29', w: '600' }), C(f.due ? (f.overdue ? 'OVERDUE ' + this.fmt(f.due) : this.fmt(f.due)) : '—', { flex: '0 0 120px', color: f.overdue ? '#B42318' : '#5F726C', w: f.overdue ? '700' : '400' })] }));
+    }
+    const regTabDefs = [['inward', 'Inward (Receipt)'], ['outward', 'Outward (Despatch)'], ['movement', 'File Movement'], ['orders', 'Orders & Notices'], ['pending', 'Pending / Overdue']];
+    const sel = s.selId ? decorated.find(f => f.id === s.selId) : null;
+    const now = new Date();
+    const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Dhaka', hour: 'numeric', hour12: false }).format(now));
+    const greetWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    return {
+      booting: false, loggedOut: false, loggedIn: true, showCreds,
+      demoMode: DEMO,
+      meName: me.name, meDesig: me.desig,
+      doLogout: () => {
+        if (!DEMO && this.token) { this.api('logout').catch(() => {}); }
+        if (!DEMO) { this.clearSession(''); }
+        else this.setState({ user: null, loginId: '', loginPass: '', loginErr: '', view: 'dashboard' });
+      },
+      // change password
+      openChangePass: () => this.setState({ cpOpen: true, cpForced: false, cpOld: '', cpNew: '', cpNew2: '', cpErr: '', cpBusy: false }),
+      cpOpen: s.cpOpen, cpForced: s.cpForced, cpCancelable: !s.cpForced,
+      cpTitle: s.cpForced ? 'Set a new password' : 'Change password',
+      cpIntro: s.cpForced ? 'You are using a temporary password. Please set your own password to continue.' : 'Choose a new password for your account.',
+      cpOld: s.cpOld, onCpOld: this.set('cpOld'), cpNew: s.cpNew, onCpNew: this.set('cpNew'), cpNew2: s.cpNew2, onCpNew2: this.set('cpNew2'),
+      cpErr: s.cpErr, cpBtnLabel: s.cpBusy ? 'Saving…' : 'Save new password',
+      closeChangePass: () => { if (!s.cpForced) this.setState({ cpOpen: false, cpErr: '' }); },
+      doChangePass: () => {
+        if (s.cpBusy) return;
+        if (s.cpNew.length < 4) { this.setState({ cpErr: 'New password must be at least 4 characters.' }); return; }
+        if (s.cpNew !== s.cpNew2) { this.setState({ cpErr: 'New passwords do not match.' }); return; }
+        if (DEMO) {
+          const u = s.users.find(u => u.id === me.id);
+          if (!u || u.pass !== s.cpOld) { this.setState({ cpErr: 'Current password is incorrect.' }); return; }
+          this.setState({ users: s.users.map(x => x.id === me.id ? { ...x, pass: s.cpNew } : x), cpOpen: false, cpForced: false, cpErr: '' });
+          return;
+        }
+        this.setState({ cpBusy: true, cpErr: '' });
+        this.api('changePassword', { oldPass: s.cpOld, newPass: s.cpNew }).then(res => {
+          if (res.ok) { this.setState({ cpOpen: false, cpForced: false, cpBusy: false, cpErr: '' }); this.flashSaved('Password changed'); }
+          else if (!res.code) this.setState({ cpBusy: false, cpErr: res.error || 'Could not change password.' });
+        }).catch(() => this.setState({ cpBusy: false, cpErr: 'Network error — please try again.' }));
+      },
+      // sync indicator
+      syncShow: s.sync !== 'idle',
+      syncLabel: s.sync === 'saving' ? (s.syncMsg || 'Saving…') : s.syncMsg,
+      syncBg: s.sync === 'error' ? '#FDECEA' : s.sync === 'saving' ? '#FFF6E6' : '#E7F2EE',
+      syncFg: s.sync === 'error' ? '#B42318' : s.sync === 'saving' ? '#9A6700' : '#0F5C4A',
+      syncIsError: s.sync === 'error',
+      syncRetry: () => { this.setState({ sync: 'idle', syncMsg: '' }); if (!DEMO) this.loadAll(false); },
+      navItems: nav.map(([key, label, count]) => ({
+        label, count, hasCount: count > 0,
+        bg: viewKey === key ? 'rgba(255,255,255,0.14)' : 'transparent',
+        fg: viewKey === key ? '#FFFFFF' : '#B9CFC7',
+        cBg: overdueCount > 0 && key === 'dashboard' ? '#B42318' : '#0F5C4A', cFg: '#FFFFFF',
+        go: () => this.setState({ view: key }),
+      })),
+      isDash: s.view === 'dashboard', isFiles: s.view === 'files', isDetail: s.view === 'detail' && !!sel,
+      isReg: s.view === 'registers', isApp: s.view === 'app', isAdmin: s.view === 'admin',
+      greeting: greetWord + ', ' + me.name.split(' ').slice(-2).join(' '),
+      todayTxt: new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Dhaka', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now),
+      stats: [
+        { label: 'On my desk', value: inbox.length, color: '#1A2E29' },
+        { label: 'Overdue', value: overdueCount, color: overdueCount ? '#B42318' : '#1A2E29' },
+        { label: 'Dept. pending', value: deptPending, color: '#1A2E29' },
+        { label: 'Disposed this month', value: decorated.filter(f => f.status !== 'Pending').length, color: '#0F5C4A' },
+      ],
+      inbox, inboxEmpty: inbox.length === 0,
+      recentOrders: decorated.filter(f => f.type === 'Order' || f.type === 'Notice').map(f => ({ ...f, dateTxt: this.fmt(f.created) })),
+      goFiles: () => this.setState({ view: 'files' }),
+      q: s.q, onQ: this.set('q'), fCat: s.fCat, onFCat: this.set('fCat'), fStatus: s.fStatus, onFStatus: this.set('fStatus'),
+      cats: s.cats.map(name => ({ name })),
+      fileRows,
+      // detail
+      sel: sel ? { ...sel, actionable: sel.status === 'Pending', closed: sel.status !== 'Pending', statusLower: sel.status.toLowerCase() } : {},
+      selMeta: sel ? [
+        { k: 'Type', v: sel.type, color: '#1A2E29' }, { k: 'Category', v: sel.cat, color: '#1A2E29' },
+        { k: 'From / To', v: sel.source, color: '#1A2E29' }, { k: 'Received / created', v: this.fmt(sel.created), color: '#1A2E29' },
+        { k: 'Currently with', v: sel.holderName, color: '#0F5C4A' },
+        { k: 'Due date', v: sel.due ? this.fmt(sel.due) : '—', color: sel.overdue ? '#B42318' : '#1A2E29' },
+      ] : [],
+      selMoves: sel ? sel.moves.map((m, i) => ({
+        line: this.uName(m.from) + '  →  ' + this.uName(m.to), dateTxt: this.fmt(m.date), note: m.note,
+        dot: i === sel.moves.length - 1 ? '#0F5C4A' : '#B9CFC7', notLast: i < sel.moves.length - 1,
+      })) : [],
+      selAtt: sel ? sel.att.map(a => ({ name: a.name, by: 'by ' + this.uName(a.by), hasUrl: !!a.url, noUrl: !a.url, url: a.url || '' })) : [],
+      attName: s.attName, onAttName: this.set('attName'),
+      addAtt: () => {
+        if (!s.attName.trim() || !sel) return;
+        const name = s.attName.trim() + '.pdf';
+        this.mutFile(sel.id, f => ({ ...f, att: [...f.att, { name, by: me.id }] }));
+        this.setState({ attName: '' });
+        this.saveOp('addAtt', { id: sel.id, name }, res => this.putFile(res.file));
+      },
+      canUpload: !DEMO, attUpMsg: s.attUpMsg,
+      onAttFile: (e) => {
+        const inp = e.target, file = inp.files && inp.files[0];
+        if (!file || !sel) return;
+        if (file.size > 10 * 1024 * 1024) { this.setState({ attUpMsg: 'File too large — maximum 10 MB.' }); inp.value = ''; return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const b64 = String(reader.result).split(',')[1];
+          this.setState({ attUpMsg: 'Uploading ' + file.name + '…' });
+          this.saveOp('uploadAtt', { id: sel.id, name: file.name, mime: file.type || 'application/octet-stream', data: b64 },
+            res => { this.putFile(res.file); this.setState({ attUpMsg: '' }); }, 'Uploaded to Drive')
+            .then(res => { if (!res.ok) this.setState({ attUpMsg: '' }); });
+        };
+        reader.readAsDataURL(file);
+        inp.value = '';
+      },
+      fwdUsers: s.users.filter(u => u.id !== me.id && u.role !== 'Admin').map(u => ({ id: u.id, label: u.name + ' — ' + u.desig })),
+      fwdTo: s.fwdTo, onFwdTo: this.set('fwdTo'), fwdNote: s.fwdNote, onFwdNote: this.set('fwdNote'), fwdDue: s.fwdDue, onFwdDue: this.set('fwdDue'),
+      doForward: () => {
+        if (!s.fwdTo || !sel) return;
+        this.mutFile(sel.id, f => ({ ...f, holder: s.fwdTo, due: s.fwdDue || f.due, moves: [...f.moves, { from: me.id, to: s.fwdTo, date: this.today(), note: s.fwdNote.trim() }] }));
+        this.setState({ fwdTo: '', fwdNote: '', fwdDue: '', view: 'files' });
+        this.saveOp('forwardFile', { id: sel.id, to: s.fwdTo, note: s.fwdNote.trim(), due: s.fwdDue }, res => this.putFile(res.file));
+      },
+      doDispose: () => {
+        if (!sel) return;
+        this.mutFile(sel.id, f => ({ ...f, status: 'Disposed', moves: [...f.moves, { from: me.id, to: 'Record', date: this.today(), note: 'Disposed and sent to record.' }] }));
+        this.saveOp('setFileStatus', { id: sel.id, op: 'dispose' }, res => this.putFile(res.file));
+      },
+      doDespatch: () => {
+        if (!sel) return;
+        if (DEMO) {
+          const outNo = 'OUT-2026-0' + s.outSeq;
+          this.mutFile(sel.id, f => ({ ...f, status: 'Despatched', outNo, moves: [...f.moves, { from: me.id, to: 'Despatch', date: this.today(), note: 'Despatched vide ' + outNo + '.' }] }));
+          this.setState({ outSeq: s.outSeq + 1 });
+          return;
+        }
+        this.saveOp('setFileStatus', { id: sel.id, op: 'despatch' }, res => this.putFile(res.file), 'Despatched');
+      },
+      doReopen: () => {
+        if (!sel) return;
+        this.mutFile(sel.id, f => ({ ...f, status: 'Pending', holder: me.id, moves: [...f.moves, { from: me.id, to: me.id, date: this.today(), note: 'File reopened.' }] }));
+        this.saveOp('setFileStatus', { id: sel.id, op: 'reopen' }, res => this.putFile(res.file));
+      },
+      linkApp: (e) => {
+        if (!sel) return;
+        const appId = e.target.value;
+        this.mutFile(sel.id, f => ({ ...f, appId }));
+        this.saveOp('linkApp', { id: sel.id, appId }, res => this.putFile(res.file));
+      },
+      appOptions: s.appItems.map(p => ({ id: p.id, label: p.pkg + ' — ' + p.desc.slice(0, 48) })),
+      // registers
+      regTabs: regTabDefs.map(([key, label]) => ({ label, go: () => this.setState({ regTab: key }), bg: s.regTab === key ? '#0F5C4A' : '#FFFFFF', fg: s.regTab === key ? '#FFFFFF' : '#3D544D', bd: s.regTab === key ? '#0F5C4A' : '#C7D4CF' })),
+      regCols, regRows, regEmpty: regRows.length === 0,
+      // APP
+      appFormOpen: s.appFormOpen, toggleAppForm: () => this.setState({ appFormOpen: !s.appFormOpen }),
+      apPkg: s.apPkg, onApPkg: this.set('apPkg'), apDesc: s.apDesc, onApDesc: this.set('apDesc'), apMethod: s.apMethod, onApMethod: this.set('apMethod'), apEst: s.apEst, onApEst: this.set('apEst'), apQtr: s.apQtr, onApQtr: this.set('apQtr'),
+      apBtnLabel: s.apBusy ? 'Adding…' : 'Add to plan',
+      addAppItem: () => {
+        if (!s.apPkg.trim() || !s.apDesc.trim() || s.apBusy) return;
+        if (DEMO) {
+          this.setState({ appItems: [...s.appItems, { id: 'p' + Date.now(), pkg: s.apPkg.trim(), desc: s.apDesc.trim(), method: s.apMethod, est: s.apEst.trim() || '—', qtr: s.apQtr, status: 'Planned' }], appFormOpen: false, apPkg: '', apDesc: '', apEst: '' });
+          return;
+        }
+        this.setState({ apBusy: true });
+        this.saveOp('addAppItem', { item: { pkg: s.apPkg.trim(), desc: s.apDesc.trim(), method: s.apMethod, est: s.apEst.trim(), qtr: s.apQtr } },
+          res => this.setState(st => ({ appItems: [...st.appItems, res.item], appFormOpen: false, apPkg: '', apDesc: '', apEst: '' })))
+          .then(() => this.setState({ apBusy: false }));
+      },
+      appRows: s.appItems.map(p => {
+        const linked = decorated.filter(f => f.appId === p.id);
+        const stages = ['Planned', 'Approved', 'Tendered', 'Awarded', 'Completed'];
+        const next = stages[Math.min(stages.indexOf(p.status) + 1, stages.length - 1)];
+        const stMap = { Planned: { bg: '#EEF4F2', fg: '#3D544D' }, Approved: { bg: '#E7F2EE', fg: '#0F5C4A' }, Tendered: { bg: '#FFF6E6', fg: '#9A6700' }, Awarded: { bg: '#EAF0F6', fg: '#33547A' }, Completed: { bg: '#E7F2EE', fg: '#0F5C4A' } };
+        return { ...p, stBg: stMap[p.status].bg, stFg: stMap[p.status].fg, hasFiles: linked.length > 0, files: linked,
+          nextLabel: p.status === 'Completed' ? 'Completed ✓' : 'Mark ' + next,
+          advance: () => {
+            if (p.status === 'Completed') return;
+            this.setState(st => ({ appItems: st.appItems.map(x => x.id === p.id ? { ...x, status: next } : x) }));
+            this.saveOp('advanceAppItem', { id: p.id }, res => this.setState(st => ({ appItems: st.appItems.map(x => x.id === p.id ? res.item : x) })));
+          } };
+      }),
+      // admin
+      userFormOpen: s.userFormOpen, toggleUserForm: () => this.setState({ userFormOpen: !s.userFormOpen, nuErr: '' }),
+      nuName: s.nuName, onNuName: this.set('nuName'), nuRole: s.nuRole, onNuRole: this.set('nuRole'), nuRep: s.nuRep, onNuRep: this.set('nuRep'), nuId: s.nuId, onNuId: this.set('nuId'), nuPass: s.nuPass, onNuPass: this.set('nuPass'),
+      nuErr: s.nuErr, nuBtnLabel: s.nuBusy ? 'Creating…' : 'Create account',
+      allOfficers: s.users.filter(u => u.role !== 'Admin').map(u => ({ id: u.id, label: u.name + ' (' + u.role + ')' })),
+      addUser: () => {
+        if (s.nuBusy) return;
+        if (!s.nuName.trim() || !s.nuId.trim() || !s.nuPass.trim()) { this.setState({ nuErr: 'Name, user ID and password are required.' }); return; }
+        const desig = { XEN: 'Executive Engineer (XEN)', SDE: 'Sub-Divisional Engineer', AE: 'Assistant Engineer', SAE: 'Sub-Assistant Engineer', Staff: 'Office Staff' }[s.nuRole];
+        if (DEMO) {
+          if (s.users.some(u => u.id === s.nuId.trim().toLowerCase())) { this.setState({ nuErr: 'User ID already exists.' }); return; }
+          this.setState({ users: [...s.users, { id: s.nuId.trim().toLowerCase(), pass: s.nuPass.trim(), name: s.nuName.trim(), desig, role: s.nuRole, reportsTo: s.nuRep }], userFormOpen: false, nuName: '', nuId: '', nuPass: '', nuRep: '', nuErr: '' });
+          return;
+        }
+        this.setState({ nuBusy: true, nuErr: '' });
+        this.api('addUser', { user: { id: s.nuId.trim().toLowerCase(), pass: s.nuPass, name: s.nuName.trim(), desig, role: s.nuRole, reportsTo: s.nuRep } }).then(res => {
+          if (res.ok) { this.setState(st => ({ users: [...st.users, res.user], userFormOpen: false, nuName: '', nuId: '', nuPass: '', nuRep: '', nuErr: '', nuBusy: false })); this.flashSaved('Account created — they must change the password at first sign-in'); }
+          else if (!res.code) this.setState({ nuBusy: false, nuErr: res.error || 'Could not create the account.' });
+        }).catch(() => this.setState({ nuBusy: false, nuErr: 'Network error — please try again.' }));
+      },
+      orgTiers: [['XEN', 'Executive Engineer'], ['SDE', 'Sub-Divisional Engineers'], ['AE', 'Assistant Engineers'], ['SAE', 'Sub-Assistant Engineers'], ['Staff', 'Office Staff'], ['Admin', 'System']].map(([role, label]) => ({
+        label, users: s.users.filter(u => u.role === role).map(u => ({
+          ...u, repName: u.reportsTo ? this.uName(u.reportsTo) : '—',
+          pwTxt: DEMO ? ' · PW: ' + u.pass : '',
+          removable: u.id !== 'admin' && u.id !== me.id,
+          reset: () => {
+            if (DEMO) { this.setState(st => ({ users: st.users.map(x => x.id === u.id ? { ...x, pass: '1234' } : x) })); return; }
+            this.saveOp('resetUserPass', { id: u.id }, null, 'Password for "' + u.id + '" reset to 1234 — they must change it at next sign-in');
+          },
+          remove: () => {
+            this.setState(st => ({ users: st.users.filter(x => x.id !== u.id) }));
+            this.saveOp('removeUser', { id: u.id });
+          },
+        })),
+      })).filter(t => t.users.length > 0),
+      catRows: s.cats.map(name => ({ name, remove: () => {
+        this.setState(st => ({ cats: st.cats.filter(c => c !== name) }));
+        this.saveOp('removeCat', { name }, res => this.setState({ cats: res.cats }));
+      } })),
+      newCat: s.newCat, onNewCat: this.set('newCat'),
+      addCat: () => {
+        const c = s.newCat.trim();
+        if (!c || s.cats.includes(c)) return;
+        this.setState({ cats: [...s.cats, c], newCat: '' });
+        this.saveOp('addCat', { name: c }, res => this.setState({ cats: res.cats }));
+      },
+      // new file modal
+      nfOpen: s.nfOpen, openNewFile: () => this.setState({ nfOpen: true, nfErr: '' }), closeNewFile: () => { if (!s.nfBusy) this.setState({ nfOpen: false }); },
+      nfType: s.nfType, onNfType: this.set('nfType'), nfCat: s.nfCat, onNfCat: this.set('nfCat'), nfSubject: s.nfSubject, onNfSubject: this.set('nfSubject'), nfSource: s.nfSource, onNfSource: this.set('nfSource'), nfDue: s.nfDue, onNfDue: this.set('nfDue'), nfErr: s.nfErr,
+      nfBtnLabel: s.nfBusy ? 'Creating…' : 'Create & register',
+      createFile: () => {
+        if (s.nfBusy) return;
+        if (!s.nfSubject.trim()) { this.setState({ nfErr: 'Subject is required.' }); return; }
+        const isIn = s.nfType === 'Incoming';
+        if (DEMO) {
+          const nf = {
+            id: Date.now(), no: 'WZPDCL/CW/2026/0' + s.seq, inNo: isIn ? 'IN-2026-' + s.inSeq : '', outNo: '',
+            type: s.nfType, cat: s.nfCat, subject: s.nfSubject.trim(), source: s.nfSource.trim() || (isIn ? 'Unknown' : 'Civil Works (self-initiated)'),
+            created: this.today(), due: s.nfDue, status: 'Pending', holder: me.id, appId: '', att: [],
+            moves: [{ from: isIn ? (s.nfSource.trim() || 'DAK') : me.id, to: me.id, date: this.today(), note: isIn ? 'Received and registered.' : 'File opened.' }],
+          };
+          this.setState({ files: [...s.files, nf], nfOpen: false, nfSubject: '', nfSource: '', nfDue: '', seq: s.seq + 1, inSeq: s.inSeq + (isIn ? 1 : 0), view: 'detail', selId: nf.id });
+          return;
+        }
+        this.setState({ nfBusy: true, nfErr: '' });
+        this.saveOp('createFile', { file: { type: s.nfType, cat: s.nfCat, subject: s.nfSubject.trim(), source: s.nfSource.trim(), due: s.nfDue } },
+          res => this.setState(st => ({ files: [...st.files, res.file], nfOpen: false, nfSubject: '', nfSource: '', nfDue: '', view: 'detail', selId: res.file.id })), 'File registered')
+          .then(res => { this.setState({ nfBusy: false }); if (res && !res.ok && res.error) this.setState({ nfErr: res.error }); });
+      },
+    };
+  }
+  doLogin() {
+    if (DEMO) {
+      const u = this.state.users.find(u => u.id === this.state.loginId.trim().toLowerCase());
+      if (u && u.pass === this.state.loginPass) this.setState({ user: u, loginErr: '', view: 'dashboard' });
+      else this.setState({ loginErr: 'Invalid user ID or password. Try a demo account below.' });
+      return;
+    }
+    const id = this.state.loginId.trim().toLowerCase(), pass = this.state.loginPass;
+    if (!id || !pass) { this.setState({ loginErr: 'Enter your user ID and password.' }); return; }
+    if (this.state.loggingIn) return;
+    this.setState({ loggingIn: true, loginErr: '' });
+    this.api('login', { id, pass }).then(res => {
+      if (!res.ok) { this.setState({ loggingIn: false, loginErr: res.error || 'Sign-in failed.' }); return; }
+      this.token = res.token;
+      localStorage.setItem(LS_TOKEN, res.token);
+      localStorage.setItem(LS_USER, JSON.stringify(res.user));
+      this.setState({
+        user: res.user, users: [res.user], loggingIn: false, loginId: '', loginPass: '', loginErr: '', view: 'dashboard',
+        cpOpen: !!res.mustChange, cpForced: !!res.mustChange, cpOld: res.mustChange ? pass : '', cpNew: '', cpNew2: '', cpErr: '',
+      });
+      this.loadAll(false);
+    }).catch(() => this.setState({ loggingIn: false, loginErr: 'Network error — check your connection and try again.' }));
+  }
+}
+</script>
+
+
+</body></html>
