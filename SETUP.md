@@ -42,7 +42,8 @@ demo credential chips on the login screen). Setting the URL switches it to live 
   do this right away, the default is public knowledge (it's in this repo).
 - Go to **Administration** and create an account for each officer (name, role, user ID,
   temporary password). Each person is asked to change their password at first login.
-- Only **Admin** and **XEN** accounts can manage users. There is no self sign-up.
+- Only the **Admin** account can manage users. There is no self sign-up.
+- Passwords must be at least 8 characters. A reset sets a temporary password that must be changed at the next sign-in.
 
 ## 4. Where your data lives
 

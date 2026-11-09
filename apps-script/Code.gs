@@ -36,6 +36,9 @@ function route_(req) {
   // every other action needs a valid session token
   var me = sessionUser_(req.token);
   if (!me) return { ok: false, error: 'Session expired. Please sign in again.', code: 'AUTH' };
+  if (me.mustChange && ['load', 'changePassword', 'logout'].indexOf(action) === -1) {
+    return { ok: false, error: 'Change the temporary password before making changes.', code: 'PASSWORD_CHANGE_REQUIRED' };
+  }
 
   switch (action) {
     case 'logout':          return logout_(req);
@@ -99,7 +102,7 @@ function sessionUser_(token) {
 function changePassword_(me, req) {
   var oldPass = String(req.oldPass || '');
   var newPass = String(req.newPass || '');
-  if (newPass.length < 4) return { ok: false, error: 'New password must be at least 4 characters.' };
+  if (newPass.length < 8) return { ok: false, error: 'New password must be at least 8 characters.' };
   return withDb_(function (db) {
     var u = findUser_(db, me.id);
     if (hash_(oldPass, u.salt) !== u.hash) return { ok: false, error: 'Current password is incorrect.' };
@@ -116,6 +119,10 @@ function hash_(pass, salt) {
 }
 
 function isManager_(u) { return u.role === 'Admin' || u.role === 'XEN'; }
+
+function canActOnFile_(u, f) {
+  return isManager_(u) || f.holder === u.id;
+}
 
 function publicUser_(u) {
   return { id: u.id, name: u.name, desig: u.desig, role: u.role, reportsTo: u.reportsTo || '' };
@@ -158,6 +165,8 @@ function createFile_(db, me, req) {
 function forwardFile_(db, me, req) {
   var f = getFile_(db, req.id);
   if (!f) return { ok: false, error: 'File not found.' };
+  if (f.status !== 'Pending') return { ok: false, error: 'Only pending files can be forwarded.' };
+  if (!canActOnFile_(me, f)) return { ok: false, error: 'Only the current holder or a manager can forward this file.' };
   if (!req.to || !findUser_(db, req.to)) return { ok: false, error: 'Forward target not found.' };
   f.holder = req.to;
   if (req.due) f.due = String(req.due);
@@ -168,6 +177,8 @@ function forwardFile_(db, me, req) {
 function setFileStatus_(db, me, req) {
   var f = getFile_(db, req.id);
   if (!f) return { ok: false, error: 'File not found.' };
+  if (req.op !== 'reopen' && f.status !== 'Pending') return { ok: false, error: 'Only pending files can be closed or despatched.' };
+  if (!canActOnFile_(me, f)) return { ok: false, error: 'Only the current holder or a manager can change this file.' };
   if (req.op === 'dispose') {
     f.status = 'Disposed';
     f.moves.push({ from: me.id, to: 'Record', date: today_(), note: 'Disposed and sent to record.' });
@@ -190,13 +201,17 @@ function setFileStatus_(db, me, req) {
 function linkApp_(db, me, req) {
   var f = getFile_(db, req.id);
   if (!f) return { ok: false, error: 'File not found.' };
-  f.appId = String(req.appId || '');
+  if (!canActOnFile_(me, f)) return { ok: false, error: 'Only the current holder or a manager can update this file.' };
+  var appId = String(req.appId || '');
+  if (appId && !db.appItems.some(function (item) { return item.id === appId; })) return { ok: false, error: 'Procurement package not found.' };
+  f.appId = appId;
   return { ok: true, file: f };
 }
 
 function addAtt_(db, me, req) {
   var f = getFile_(db, req.id);
   if (!f) return { ok: false, error: 'File not found.' };
+  if (!canActOnFile_(me, f)) return { ok: false, error: 'Only the current holder or a manager can add attachments.' };
   var name = String(req.name || '').trim();
   if (!name) return { ok: false, error: 'Attachment name is required.' };
   f.att.push({ name: name, by: me.id });
@@ -206,6 +221,7 @@ function addAtt_(db, me, req) {
 function uploadAtt_(db, me, req) {
   var f = getFile_(db, req.id);
   if (!f) return { ok: false, error: 'File not found.' };
+  if (!canActOnFile_(me, f)) return { ok: false, error: 'Only the current holder or a manager can upload attachments.' };
   var name = String(req.name || '').trim();
   var data = String(req.data || ''); // base64
   if (!name || !data) return { ok: false, error: 'Attachment name and data are required.' };
@@ -220,6 +236,7 @@ function uploadAtt_(db, me, req) {
 }
 
 function addAppItem_(db, me, req) {
+  if (!isManager_(me)) return { ok: false, error: 'Only Admin or XEN can manage the procurement plan.' };
   var it = req.item || {};
   if (!String(it.pkg || '').trim() || !String(it.desc || '').trim()) return { ok: false, error: 'Package no. and description are required.' };
   var item = {
@@ -233,6 +250,7 @@ function addAppItem_(db, me, req) {
 }
 
 function advanceAppItem_(db, me, req) {
+  if (!isManager_(me)) return { ok: false, error: 'Only Admin or XEN can manage the procurement plan.' };
   var stages = ['Planned', 'Approved', 'Tendered', 'Awarded', 'Completed'];
   var item = null;
   for (var i = 0; i < db.appItems.length; i++) if (db.appItems[i].id === req.id) item = db.appItems[i];
@@ -243,12 +261,15 @@ function advanceAppItem_(db, me, req) {
 }
 
 function addCat_(db, me, req) {
+  if (!isManager_(me)) return { ok: false, error: 'Only Admin or XEN can manage categories.' };
   var c = String(req.name || '').trim();
   if (c && db.cats.indexOf(c) === -1) db.cats.push(c);
   return { ok: true, cats: db.cats };
 }
 
 function removeCat_(db, me, req) {
+  if (!isManager_(me)) return { ok: false, error: 'Only Admin or XEN can manage categories.' };
+  if (db.files.some(function (f) { return f.cat === req.name; })) return { ok: false, error: 'This category is used by existing files and cannot be removed.' };
   db.cats = db.cats.filter(function (c) { return c !== req.name; });
   return { ok: true, cats: db.cats };
 }
@@ -256,15 +277,18 @@ function removeCat_(db, me, req) {
 // ---------------------------------------------------------------- user management (Admin / XEN)
 
 function addUser_(db, me, req) {
-  if (!isManager_(me)) return { ok: false, error: 'Only Admin or XEN can manage users.' };
+  if (me.role !== 'Admin') return { ok: false, error: 'Only Admin can manage users.' };
   var u = req.user || {};
   var id = String(u.id || '').trim().toLowerCase();
+  var role = String(u.role || 'SAE');
   if (!id || !String(u.name || '').trim() || !String(u.pass || '')) return { ok: false, error: 'Name, user ID and password are required.' };
+  if (String(u.pass).length < 8) return { ok: false, error: 'Temporary passwords must be at least 8 characters.' };
+  if (['XEN', 'SDE', 'AE', 'SAE', 'Staff'].indexOf(role) === -1) return { ok: false, error: 'Invalid role.' };
   if (findUser_(db, id)) return { ok: false, error: 'User ID "' + id + '" already exists.' };
   var salt = Utilities.getUuid();
   var nu = {
     id: id, name: String(u.name).trim(),
-    desig: String(u.desig || u.role || ''), role: String(u.role || 'SAE'), reportsTo: String(u.reportsTo || ''),
+    desig: String(u.desig || role || ''), role: role, reportsTo: String(u.reportsTo || ''),
     salt: salt, hash: hash_(String(u.pass), salt), mustChange: true,
   };
   db.users.push(nu);
@@ -272,9 +296,10 @@ function addUser_(db, me, req) {
 }
 
 function resetUserPass_(db, me, req) {
-  if (!isManager_(me)) return { ok: false, error: 'Only Admin or XEN can manage users.' };
+  if (me.role !== 'Admin') return { ok: false, error: 'Only Admin can manage users.' };
   var u = findUser_(db, req.id);
   if (!u) return { ok: false, error: 'User not found.' };
+  if (u.id === 'admin') return { ok: false, error: 'The administrator password must be changed by that account.' };
   u.salt = Utilities.getUuid();
   u.hash = hash_('1234', u.salt);
   u.mustChange = true;
@@ -282,8 +307,12 @@ function resetUserPass_(db, me, req) {
 }
 
 function removeUser_(db, me, req) {
-  if (!isManager_(me)) return { ok: false, error: 'Only Admin or XEN can manage users.' };
+  if (me.role !== 'Admin') return { ok: false, error: 'Only Admin can manage users.' };
   if (req.id === 'admin' || req.id === me.id) return { ok: false, error: 'This account cannot be removed.' };
+  var target = findUser_(db, req.id);
+  if (!target) return { ok: false, error: 'User not found.' };
+  if (db.files.some(function (f) { return f.status === 'Pending' && f.holder === target.id; })) return { ok: false, error: 'Reassign this user\'s pending files before removing the account.' };
+  if (db.users.some(function (u) { return u.reportsTo === target.id; })) return { ok: false, error: 'Reassign staff who report to this user before removing the account.' };
   db.users = db.users.filter(function (u) { return u.id !== req.id; });
   return { ok: true };
 }

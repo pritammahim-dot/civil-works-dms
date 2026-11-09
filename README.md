@@ -12,7 +12,7 @@ File, letter (dak) and work tracking system for the Civil Works division, P&D, W
 - Files & Letters: incoming/outgoing/dak registration with auto file numbers, movement history, forward/dispose/despatch/reopen
 - Registers: inward, outward, file movement, orders & notices, pending/overdue
 - Annual Procurement Plan with file linkage and stage tracking
-- Administration: user accounts (Admin/XEN managed, no self sign-up), org hierarchy, file categories
+- Administration: Admin-managed user accounts (no self sign-up), org hierarchy, and file categories
 - Password-protected accounts (salted-hash storage, forced password change on first login), attachment upload to Google Drive
 
 ## Files

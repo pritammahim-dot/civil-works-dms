@@ -254,10 +254,10 @@
                   </div>
                 </sc-for>
               </div>
-              <div style="display:flex;gap:8px;margin-top:12px">
-                <input value="{{ attName }}" sc-camel-on-change="{{ onAttName }}" placeholder="Document name, e.g. Scan of estimate" style="flex:1;padding:8px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none" style-focus="border-color:#0F5C4A">
-                <button sc-camel-on-click="{{ addAtt }}" style="background:#EEF4F2;color:#0F5C4A;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#DDEAE5">Attach scan</button>
-              </div>
+              <sc-if value="{{ sel.canEdit }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;margin-top:12px">
+                <input value="{{ attName }}" sc-camel-on-change="{{ onAttName }}" placeholder="Attachment record, e.g. Original estimate filed" style="flex:1;padding:8px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none" style-focus="border-color:#0F5C4A">
+                <button sc-camel-on-click="{{ addAtt }}" style="background:#EEF4F2;color:#0F5C4A;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#DDEAE5">Record attachment</button>
+              </div></sc-if>
               <sc-if value="{{ canUpload }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
                   <span style="font-size:12px;font-weight:600;color:#5F726C">Upload to Drive (max 10 MB):</span>
@@ -290,15 +290,15 @@
               </div>
             </sc-if>
             <sc-if value="{{ sel.closed }}" hint-placeholder-val="{{ false }}">
-              <div style="background:#F6FAF8;border:1px solid #DCE5E1;border-radius:10px;padding:18px 20px;font-size:13px;color:#3D544D">This file is {{ sel.statusLower }}. No further movement. <button sc-camel-on-click="{{ doReopen }}" style="background:none;border:none;color:#0F5C4A;font-weight:600;cursor:pointer;font-size:13px;padding:0">Reopen</button></div>
+              <div style="background:#F6FAF8;border:1px solid #DCE5E1;border-radius:10px;padding:18px 20px;font-size:13px;color:#3D544D">This file is {{ sel.statusLower }}. No further movement. <sc-if value="{{ sel.canReopen }}" hint-placeholder-val="{{ false }}"><button sc-camel-on-click="{{ doReopen }}" style="background:none;border:none;color:#0F5C4A;font-weight:600;cursor:pointer;font-size:13px;padding:0">Reopen</button></sc-if></div>
             </sc-if>
             <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:20px 22px">
               <div style="font-size:15px;font-weight:700;margin-bottom:10px">APP linkage</div>
               <div style="font-size:12.5px;color:#5F726C;margin-bottom:10px">Link this file to a package in the Annual Procurement Plan.</div>
-              <sc-raw-select value="{{ sel.appId }}" sc-camel-on-change="{{ linkApp }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;background:#FFFFFF;cursor:pointer;width:100%">
+              <sc-if value="{{ sel.canEdit }}" hint-placeholder-val="{{ false }}"><sc-raw-select value="{{ sel.appId }}" sc-camel-on-change="{{ linkApp }}" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13.5px;background:#FFFFFF;cursor:pointer;width:100%">
                 <option value="">— Not linked —</option>
                 <sc-for list="{{ appOptions }}" as="p" hint-placeholder-count="2"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
-              </sc-raw-select>
+              </sc-raw-select></sc-if>
             </div>
           </div>
         </div>
@@ -340,7 +340,7 @@
             <div style="font-size:22px;font-weight:700">Annual Procurement Plan</div>
             <div style="font-size:13.5px;color:#5F726C;margin-top:3px">FY 2026–27 · Civil Works, P&amp;D, WZPDCL</div>
           </div>
-          <button sc-camel-on-click="{{ toggleAppForm }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">+ Add package</button>
+          <sc-if value="{{ canManageProcurement }}" hint-placeholder-val="{{ false }}"><button sc-camel-on-click="{{ toggleAppForm }}" style="background:#0F5C4A;color:#FFFFFF;border:none;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#0A4235">+ Add package</button></sc-if>
         </div>
         <sc-if value="{{ appFormOpen }}" hint-placeholder-val="{{ false }}">
           <div style="background:#FFFFFF;border:1px solid #DCE5E1;border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:12px">
@@ -376,7 +376,7 @@
                   <div style="font-size:14.5px;font-weight:600;margin-top:7px">{{ p.desc }}</div>
                   <div style="font-size:12.5px;color:#5F726C;margin-top:3px">Estimated cost: {{ p.est }}</div>
                 </div>
-                <button sc-camel-on-click="{{ p.advance }}" style="background:#FFFFFF;color:#0F5C4A;border:1px solid #C7D4CF;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;flex:0 0 auto" style-hover="border-color:#0F5C4A">{{ p.nextLabel }}</button>
+                <sc-if value="{{ p.canAdvance }}" hint-placeholder-val="{{ false }}"><button sc-camel-on-click="{{ p.advance }}" style="background:#FFFFFF;color:#0F5C4A;border:1px solid #C7D4CF;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;flex:0 0 auto" style-hover="border-color:#0F5C4A">{{ p.nextLabel }}</button></sc-if>
               </div>
               <sc-if value="{{ p.hasFiles }}" hint-placeholder-val="{{ false }}">
                 <div style="border-top:1px solid #ECF1EF;margin-top:14px;padding-top:12px">
@@ -418,7 +418,7 @@
                   <sc-for list="{{ allOfficers }}" as="u"><option value="{{ u.id }}">{{ u.label }}</option></sc-for>
                 </sc-raw-select>
                 <input value="{{ nuId }}" sc-camel-on-change="{{ onNuId }}" placeholder="User ID e.g. sde5" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;background:#FFFFFF" style-focus="border-color:#0F5C4A">
-                <input value="{{ nuPass }}" sc-camel-on-change="{{ onNuPass }}" placeholder="Password" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;background:#FFFFFF" style-focus="border-color:#0F5C4A">
+                <input type="password" value="{{ nuPass }}" sc-camel-on-change="{{ onNuPass }}" placeholder="Temporary password (8+ characters)" style="padding:9px 12px;border:1px solid #C7D4CF;border-radius:8px;font-size:13px;outline:none;background:#FFFFFF" style-focus="border-color:#0F5C4A">
               </div>
               <sc-if value="{{ nuErr }}" hint-placeholder-val="{{ false }}">
                 <div style="background:#FDECEA;color:#B42318;font-size:12.5px;padding:8px 12px;border-radius:8px">{{ nuErr }}</div>
@@ -441,7 +441,7 @@
                       <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#3D544D;margin-top:7px">ID: {{ u.id }}{{ u.pwTxt }}</div>
                       <div style="font-size:11.5px;color:#5F726C;margin-top:3px">Reports to: {{ u.repName }}</div>
                       <div style="display:flex;gap:6px;margin-top:9px">
-                        <button sc-camel-on-click="{{ u.reset }}" style="background:#EEF4F2;color:#0F5C4A;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer" style-hover="background:#DDEAE5">Reset PW</button>
+                        <sc-if value="{{ u.resettable }}" hint-placeholder-val="{{ false }}"><button sc-camel-on-click="{{ u.reset }}" style="background:#EEF4F2;color:#0F5C4A;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer" style-hover="background:#DDEAE5">Reset PW</button></sc-if>
                         <sc-if value="{{ u.removable }}" hint-placeholder-val="{{ false }}">
                           <button sc-camel-on-click="{{ u.remove }}" style="background:#FDECEA;color:#B42318;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer" style-hover="background:#FADBD7">Remove</button>
                         </sc-if>
@@ -677,7 +677,10 @@ class Component extends DCLogic {
     this.setState({ sync: 'saving', syncMsg: 'Saving…' });
     return this.api(action, payload).then(res => {
       if (res.ok) { if (reconcile) reconcile(res); this.flashSaved(savedMsg); }
-      else if (!res.code) this.setState({ sync: 'error', syncMsg: res.error || 'Save failed.' });
+      else if (res.code !== 'AUTH') {
+        this.setState({ sync: 'error', syncMsg: res.error || 'Save failed.' });
+        this.loadAll(false);
+      }
       return res;
     }).catch(() => { this.setState({ sync: 'error', syncMsg: 'Network error — change may not be saved.' }); return { ok: false }; });
   }
@@ -733,6 +736,7 @@ class Component extends DCLogic {
       };
     }
     const isAdminUser = me.role === 'Admin';
+    const isManager = isAdminUser || me.role === 'XEN';
     const decorated = s.files.map(f => this.decorate(f));
     const inbox = decorated.filter(f => f.status === 'Pending' && (f.holder === me.id || isAdminUser));
     const overdueCount = inbox.filter(f => f.overdue).length;
@@ -740,7 +744,7 @@ class Component extends DCLogic {
     const nav = [
       ['dashboard', 'Dashboard', inbox.length], ['files', 'Files & Letters', 0], ['registers', 'Registers', 0], ['app', 'Procurement Plan', 0],
     ];
-    if (isAdminUser || me.role === 'XEN') nav.push(['admin', 'Administration', 0]);
+    if (isAdminUser) nav.push(['admin', 'Administration', 0]);
     const viewKey = s.view === 'detail' ? 'files' : s.view;
     const q = s.q.toLowerCase();
     const fileRows = decorated.filter(f =>
@@ -792,7 +796,7 @@ class Component extends DCLogic {
       closeChangePass: () => { if (!s.cpForced) this.setState({ cpOpen: false, cpErr: '' }); },
       doChangePass: () => {
         if (s.cpBusy) return;
-        if (s.cpNew.length < 4) { this.setState({ cpErr: 'New password must be at least 4 characters.' }); return; }
+        if (s.cpNew.length < 8) { this.setState({ cpErr: 'New password must be at least 8 characters.' }); return; }
         if (s.cpNew !== s.cpNew2) { this.setState({ cpErr: 'New passwords do not match.' }); return; }
         if (DEMO) {
           const u = s.users.find(u => u.id === me.id);
@@ -837,7 +841,7 @@ class Component extends DCLogic {
       cats: s.cats.map(name => ({ name })),
       fileRows,
       // detail
-      sel: sel ? { ...sel, actionable: sel.status === 'Pending', closed: sel.status !== 'Pending', statusLower: sel.status.toLowerCase() } : {},
+      sel: sel ? { ...sel, canEdit: isManager || sel.holder === me.id, actionable: sel.status === 'Pending' && (isManager || sel.holder === me.id), closed: sel.status !== 'Pending', canReopen: isManager || sel.holder === me.id, statusLower: sel.status.toLowerCase() } : {},
       selMeta: sel ? [
         { k: 'Type', v: sel.type, color: '#1A2E29' }, { k: 'Category', v: sel.cat, color: '#1A2E29' },
         { k: 'From / To', v: sel.source, color: '#1A2E29' }, { k: 'Received / created', v: this.fmt(sel.created), color: '#1A2E29' },
@@ -857,7 +861,7 @@ class Component extends DCLogic {
         this.setState({ attName: '' });
         this.saveOp('addAtt', { id: sel.id, name }, res => this.putFile(res.file));
       },
-      canUpload: !DEMO, attUpMsg: s.attUpMsg,
+      canUpload: !DEMO && !!sel && (isManager || sel.holder === me.id), attUpMsg: s.attUpMsg,
       onAttFile: (e) => {
         const inp = e.target, file = inp.files && inp.files[0];
         if (!file || !sel) return;
@@ -912,11 +916,12 @@ class Component extends DCLogic {
       regTabs: regTabDefs.map(([key, label]) => ({ label, go: () => this.setState({ regTab: key }), bg: s.regTab === key ? '#0F5C4A' : '#FFFFFF', fg: s.regTab === key ? '#FFFFFF' : '#3D544D', bd: s.regTab === key ? '#0F5C4A' : '#C7D4CF' })),
       regCols, regRows, regEmpty: regRows.length === 0,
       // APP
-      appFormOpen: s.appFormOpen, toggleAppForm: () => this.setState({ appFormOpen: !s.appFormOpen }),
+      canManageProcurement: isManager,
+      appFormOpen: s.appFormOpen, toggleAppForm: () => { if (isManager) this.setState({ appFormOpen: !s.appFormOpen }); },
       apPkg: s.apPkg, onApPkg: this.set('apPkg'), apDesc: s.apDesc, onApDesc: this.set('apDesc'), apMethod: s.apMethod, onApMethod: this.set('apMethod'), apEst: s.apEst, onApEst: this.set('apEst'), apQtr: s.apQtr, onApQtr: this.set('apQtr'),
       apBtnLabel: s.apBusy ? 'Adding…' : 'Add to plan',
       addAppItem: () => {
-        if (!s.apPkg.trim() || !s.apDesc.trim() || s.apBusy) return;
+        if (!isManager || !s.apPkg.trim() || !s.apDesc.trim() || s.apBusy) return;
         if (DEMO) {
           this.setState({ appItems: [...s.appItems, { id: 'p' + Date.now(), pkg: s.apPkg.trim(), desc: s.apDesc.trim(), method: s.apMethod, est: s.apEst.trim() || '—', qtr: s.apQtr, status: 'Planned' }], appFormOpen: false, apPkg: '', apDesc: '', apEst: '' });
           return;
@@ -932,9 +937,9 @@ class Component extends DCLogic {
         const next = stages[Math.min(stages.indexOf(p.status) + 1, stages.length - 1)];
         const stMap = { Planned: { bg: '#EEF4F2', fg: '#3D544D' }, Approved: { bg: '#E7F2EE', fg: '#0F5C4A' }, Tendered: { bg: '#FFF6E6', fg: '#9A6700' }, Awarded: { bg: '#EAF0F6', fg: '#33547A' }, Completed: { bg: '#E7F2EE', fg: '#0F5C4A' } };
         return { ...p, stBg: stMap[p.status].bg, stFg: stMap[p.status].fg, hasFiles: linked.length > 0, files: linked,
-          nextLabel: p.status === 'Completed' ? 'Completed ✓' : 'Mark ' + next,
+          canAdvance: isManager, nextLabel: p.status === 'Completed' ? 'Completed ✓' : 'Mark ' + next,
           advance: () => {
-            if (p.status === 'Completed') return;
+            if (!isManager || p.status === 'Completed') return;
             this.setState(st => ({ appItems: st.appItems.map(x => x.id === p.id ? { ...x, status: next } : x) }));
             this.saveOp('advanceAppItem', { id: p.id }, res => this.setState(st => ({ appItems: st.appItems.map(x => x.id === p.id ? res.item : x) })));
           } };
@@ -947,6 +952,7 @@ class Component extends DCLogic {
       addUser: () => {
         if (s.nuBusy) return;
         if (!s.nuName.trim() || !s.nuId.trim() || !s.nuPass.trim()) { this.setState({ nuErr: 'Name, user ID and password are required.' }); return; }
+        if (s.nuPass.length < 8) { this.setState({ nuErr: 'Temporary password must be at least 8 characters.' }); return; }
         const desig = { XEN: 'Executive Engineer (XEN)', SDE: 'Sub-Divisional Engineer', AE: 'Assistant Engineer', SAE: 'Sub-Assistant Engineer', Staff: 'Office Staff' }[s.nuRole];
         if (DEMO) {
           if (s.users.some(u => u.id === s.nuId.trim().toLowerCase())) { this.setState({ nuErr: 'User ID already exists.' }); return; }
@@ -963,7 +969,8 @@ class Component extends DCLogic {
         label, users: s.users.filter(u => u.role === role).map(u => ({
           ...u, repName: u.reportsTo ? this.uName(u.reportsTo) : '—',
           pwTxt: DEMO ? ' · PW: ' + u.pass : '',
-          removable: u.id !== 'admin' && u.id !== me.id,
+          resettable: u.id !== 'admin' && (isAdminUser || u.role !== 'XEN'),
+          removable: u.id !== 'admin' && u.id !== me.id && (isAdminUser || u.role !== 'XEN'),
           reset: () => {
             if (DEMO) { this.setState(st => ({ users: st.users.map(x => x.id === u.id ? { ...x, pass: '1234' } : x) })); return; }
             this.saveOp('resetUserPass', { id: u.id }, null, 'Password for "' + u.id + '" reset to 1234 — they must change it at next sign-in');
