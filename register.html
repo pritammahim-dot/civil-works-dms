@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>File Movement Register | Civil, P&amp;D, WZPDCL</title>
+<script src="register-core.js"></script>
+<script src="dc-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --brand:#0F5C4A;--brand-d:#0A4235;--ink:#1A2E29;--muted:#4D625B;--line:#D5E0DB;--line-2:#E8EEEB;
+    --bg:#F4F7F6;--card:#FFFFFF;--side:#0C2B25;--side-ink:#DCEAE4;--side-mut:#9CC0B3;
+    --warn-bg:#FFF1D6;--warn-fg:#7A4A00;--warn-line:#EBCB8B;--ok-bg:#E3F1EC;--ok-fg:#0B5240;
+    --err-bg:#FDECEA;--err-fg:#A8261B;--focus:#1F7A5F;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:16px;line-height:1.5}
+  button,input,select,textarea{font:inherit;color:inherit}
+  a{color:var(--brand)}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+  .muted{color:var(--muted)} .sm{font-size:14px} .strong{font-weight:600}
+  .sub{display:block;font-size:13px;color:var(--muted);margin-top:2px;font-weight:400}
+  .h2{font-size:22px;line-height:1.3;margin:0;font-weight:700}
+  .h3{font-size:17px;line-height:1.35;margin:0;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  p{margin:4px 0 0}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 16px;border-radius:8px;border:1px solid #B3C6BE;background:#fff;color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap}
+  .btn:hover{background:#F0F6F3}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff} .btn.primary:hover{background:var(--brand-d)}
+  .btn.danger{background:var(--err-fg);border-color:var(--err-fg);color:#fff} .btn.danger:hover{background:#8C1E15}
+  .btn.ghost{border-color:transparent;background:transparent;padding-left:8px;padding-right:10px}
+  .btn.ghost:hover{background:#E8F0EC}
+  .btn.block{width:100%}
+  .btn[disabled]{opacity:.6;cursor:progress}
+  .btn svg{flex:0 0 auto}
+
+  .fld{display:flex;flex-direction:column;gap:6px}
+  .fld-lbl{font-size:14px;font-weight:600;color:#2F4640}
+  .req{color:var(--err-fg)}
+  .inp{width:100%;min-height:44px;padding:9px 12px;border:1px solid #A3B8B0;border-radius:8px;background:#fff;font-size:16px}
+  .inp:focus{border-color:var(--brand)}
+  textarea.inp{min-height:72px;resize:vertical}
+  .hint{font-size:13.5px;color:var(--muted);margin:0}
+  .alert{padding:10px 12px;border-radius:8px;font-size:14.5px;display:flex;gap:10px;align-items:flex-start}
+  .alert svg{margin-top:2px;flex:0 0 auto}
+  .alert.err{background:var(--err-bg);color:var(--err-fg)}
+  .alert.warn{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-line)}
+  .alert.ok{background:var(--ok-bg);color:var(--ok-fg)}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:100px;font-size:13.5px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+  .badge.warn{background:var(--warn-bg);color:var(--warn-fg);border-color:var(--warn-line)}
+  .badge.ok{background:var(--ok-bg);color:var(--ok-fg)}
+  .badge.off{background:#ECEFEE;color:#4D5A56}
+  .pill{display:inline-block;min-width:26px;padding:0 9px;border-radius:100px;font-size:13px;font-weight:700;text-align:center;background:#E8EEEB;color:var(--ink)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn-fg)}
+  .empty{padding:16px;border:1px dashed #C7D5CF;border-radius:10px;color:var(--muted);font-size:15px;margin-top:12px;text-align:center}
+
+  /* login */
+  .splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px;background:linear-gradient(160deg,#0C2B25 0%,#0F4437 100%)}
+  .login-card{width:100%;max-width:420px;background:#fff;border-radius:14px;padding:30px 26px;box-shadow:0 24px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:14px}
+  .brand-row{display:flex;gap:14px;align-items:center;margin-bottom:6px}
+  .logo{width:48px;height:48px;border-radius:10px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 auto}
+  .logo.sm{width:36px;height:36px;font-size:13px;border-radius:8px}
+  .login-title{font-size:19px;margin:0;line-height:1.25}
+  .demo-box{width:100%;max-width:420px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:14px 16px;color:#E4F0EB}
+  .demo-box .t{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#A9D1C3;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{min-height:40px;background:rgba(255,255,255,.12);color:#F0F7F4;border:1px solid transparent;border-radius:100px;padding:6px 12px;font-size:13.5px;cursor:pointer;font-family:'IBM Plex Mono',monospace}
+  .chip:hover{background:rgba(255,255,255,.22)}
+  .chip .r{opacity:.7}
+
+  /* shell */
+  .app{display:flex;min-height:100vh}
+  .side{width:210px;flex:0 0 210px;background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;padding:18px 12px;gap:6px;position:sticky;top:0;height:100vh}
+  .side-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px}
+  .side-title{font-weight:700;color:#fff;font-size:15px;line-height:1.2}
+  .side-sub{font-size:12.5px;color:var(--side-mut)}
+  .nav{display:flex;flex-direction:column;gap:4px}
+  .nav-btn{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:9px 12px;border:none;border-radius:8px;background:transparent;color:#C8DDD5;font-weight:600;font-size:15px;cursor:pointer;text-align:left}
+  .nav-btn:hover{background:rgba(255,255,255,.08)}
+  .nav-btn.on{background:rgba(255,255,255,.16);color:#fff}
+  .nav-btn .count{margin-left:auto;background:#E2A93B;color:#2A1A00;border-radius:100px;padding:0 8px;font-size:12.5px;font-weight:700;min-width:24px;text-align:center}
+  .side-me{margin-top:auto;border-top:1px solid rgba(255,255,255,.14);padding:14px 8px 4px}
+  .me-name{font-weight:600;color:#fff;font-size:14.5px;line-height:1.3}
+  .me-desig{font-size:13px;color:var(--side-mut)}
+  .me-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .side-btn{min-height:40px;padding:6px 10px;font-size:13.5px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:var(--side-ink)}
+  .side-btn:hover{background:rgba(255,255,255,.16)}
+  .main{flex:1;min-width:0;padding:24px 20px 96px}
+  .demo-banner{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn-fg);border-radius:8px;padding:8px 12px;font-size:14px;margin-bottom:16px;max-width:1280px}
+  .page{display:flex;flex-direction:column;gap:18px;max-width:1280px}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+  .head-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+
+  /* desk */
+  .desk-list{display:flex;flex-direction:column;margin-top:8px}
+  .desk-item{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line-2);flex-wrap:wrap}
+  .desk-item:first-child{border-top:none}
+  .desk-main{min-width:240px;flex:1}
+  .desk-acts{display:flex;gap:8px;flex-wrap:wrap}
+  .ref{font-size:13.5px;color:var(--brand);font-weight:600}
+  .subj{font-weight:600;font-size:16px;margin-top:2px}
+
+  /* register */
+  .toolbar{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+  .grow{flex:1;min-width:240px}
+  .search{position:relative;display:block}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+  .search .inp{padding-left:40px}
+  .seg{display:inline-flex;border:1px solid #A3B8B0;border-radius:8px;overflow:hidden;background:#fff;flex-wrap:wrap}
+  .seg-btn{min-height:42px;padding:8px 14px;border:none;border-left:1px solid #D5E0DB;background:#fff;font-weight:600;font-size:14.5px;cursor:pointer;color:var(--ink)}
+  .seg-btn:first-child{border-left:none}
+  .seg-btn:hover{background:#F0F6F3}
+  .seg-btn.on{background:var(--brand);color:#fff}
+  .reg{background:#fff;border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+  .reg-head,.reg-row{display:grid;grid-template-columns:36px 90px 126px minmax(120px,1fr) 102px 142px 148px 140px;gap:10px;align-items:start;padding:12px 12px;min-width:1000px}
+  .reg-row .mono{font-size:14px}
+  .reg-head{background:#F1F6F4;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700;color:#3B524B;text-transform:uppercase;letter-spacing:.4px;padding-top:10px;padding-bottom:10px}
+  .reg-row{width:100%;border:none;border-top:1px solid var(--line-2);background:#fff;text-align:left;font-size:15px;cursor:pointer;color:var(--ink)}
+  .reg-row:first-of-type{border-top:none}
+  .reg-row:hover{background:#F5FAF8}
+  .reg-row .lbl{display:none}
+  .c{min-width:0;overflow-wrap:anywhere}
+  .reg-foot{font-size:14px;color:var(--muted)}
+
+  /* detail */
+  .back{align-self:flex-start;margin-left:-8px}
+  .detail-head{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+  .detail-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,410px);gap:18px;align-items:start}
+  .meta{margin:10px 0 0}
+  .meta-row{display:grid;grid-template-columns:190px 1fr;gap:12px;padding:9px 0;border-top:1px solid var(--line-2)}
+  .meta-row:first-child{border-top:none}
+  .meta dt{font-size:14px;color:var(--muted);font-weight:600}
+  .meta dd{margin:0;font-size:15.5px;overflow-wrap:anywhere}
+  .action-panel{display:flex;flex-direction:column;gap:12px;border:2px solid #9CC4B4}
+  .radio-group{border:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
+  .radio{display:flex;align-items:center;gap:10px;min-height:40px;font-size:15.5px;cursor:pointer}
+  .radio input{width:20px;height:20px;accent-color:var(--brand);margin:0}
+  .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .hist-wrap{overflow-x:auto;margin-top:10px}
+  .hist-inner{min-width:920px}
+  .hist-head,.hist-row{display:grid;grid-template-columns:34px 176px 150px minmax(220px,1.3fr) 150px minmax(150px,1fr);gap:12px;padding:10px 4px;align-items:start}
+  .hist-head{font-size:12.5px;font-weight:700;color:#3B524B;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--line)}
+  .hist{list-style:none;margin:0;padding:0}
+  .hist-row{border-top:1px solid var(--line-2);font-size:15px}
+  .hist-row:first-child{border-top:none}
+  .hist-row .lbl{display:none}
+  .tag{display:inline-block;padding:2px 9px;border-radius:6px;font-size:13px;font-weight:700;background:#EEF3F1;color:#24483E}
+  .t-inward{background:#E4ECF7;color:#22446B}
+  .t-receipt{background:var(--ok-bg);color:var(--ok-fg)}
+  .t-recalled{background:var(--err-bg);color:var(--err-fg)}
+  .move{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .move svg{color:var(--muted)}
+  .t-closed{background:#E6E9EE;color:#2F3A4A}
+  .t-reopened{background:var(--warn-bg);color:var(--warn-fg)}
+  .t-corrected{background:#F1E8F7;color:#5B2C7A}
+  .changes{display:flex;flex-direction:column;gap:2px}
+  .chg .old{text-decoration:line-through;color:var(--muted)}
+  .badge.closed{background:#E6E9EE;color:#2F3A4A}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .divider{border-top:1px solid var(--line);margin:6px 0 2px}
+
+  /* officers */
+  .off-row{display:grid;grid-template-columns:minmax(200px,1.4fr) minmax(150px,1fr) 110px minmax(260px,auto);gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line-2)}
+  .off-row:first-child{border-top:none}
+  .off-row.inactive .off-name{color:var(--muted)}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+
+  /* modal + toast */
+  .overlay{position:fixed;inset:0;background:rgba(10,30,25,.55);display:flex;align-items:flex-start;justify-content:center;z-index:60;padding:40px 16px;overflow-y:auto}
+  .modal{background:#fff;border-radius:14px;padding:24px 24px 22px;width:100%;max-width:560px;box-shadow:0 30px 80px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:14px}
+  .modal.narrow{max-width:440px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .toast{position:fixed;right:16px;bottom:16px;z-index:80;max-width:min(470px,calc(100vw - 32px));display:flex;align-items:flex-start;gap:10px;padding:12px 10px 12px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.22);font-size:15px;font-weight:500}
+  .toast svg{margin-top:2px;flex:0 0 auto}
+  .toast.ok{background:#0F3D32;color:#fff}
+  .toast.err{background:var(--err-fg);color:#fff}
+  .toast-x{background:transparent;border:none;color:inherit;cursor:pointer;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;margin-left:auto}
+  .toast-x:hover{background:rgba(255,255,255,.15)}
+
+  @media (max-width:980px){ .detail-grid{grid-template-columns:1fr} }
+  @media (max-width:1100px){
+    .reg{background:transparent;border:none;overflow:visible}
+    .reg-head{display:none}
+    .reg-row{grid-template-columns:1fr 1fr;min-width:0;gap:10px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:14px}
+    .reg-row:first-of-type{border-top:1px solid var(--line)}
+    .reg-row .lbl{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+    .c-sl{order:1} .c-st{order:2;justify-self:end;text-align:right} .c-st .lbl{display:none}
+    .c-ref{order:3;grid-column:1 / -1} .c-subj{order:4;grid-column:1 / -1}
+    .c-holder{order:5} .c-last{order:6} .c-date{order:7} .c-from{order:8}
+    .off-row{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:760px){
+    .app{flex-direction:column}
+    .side{width:auto;flex:none;height:auto;z-index:30;padding:10px 12px 8px;gap:8px}
+    .side-brand{padding:0 96px 0 2px}
+    .side-sub{display:none}
+    .nav{flex-direction:row;overflow-x:auto;gap:4px}
+    .nav-btn{width:auto;flex:0 0 auto;padding:8px 12px}
+    .side-me{margin-top:0;border-top:none;padding:0;position:absolute;top:8px;right:10px}
+    .me-name,.me-desig,.side-btn .t{display:none}
+    .me-actions{margin-top:0}
+    .side-btn{min-width:44px;min-height:44px;padding:6px}
+    .main{padding:16px 14px 96px}
+    .h2{font-size:20px}
+    .hist-inner{min-width:0}
+    .hist-head{display:none}
+    .hist-row{grid-template-columns:1fr;gap:4px;padding:12px 0}
+    .hist-row .lbl{display:inline;font-weight:600;color:var(--muted);font-size:13px}
+    .h-no{display:none}
+    .meta-row{grid-template-columns:1fr;gap:2px}
+    .two{grid-template-columns:1fr}
+    .off-row{grid-template-columns:1fr}
+  }
+  @media (max-width:760px){
+    .reg-row{gap:8px 12px;padding:12px}
+    .reg-row .c-sl .lbl{display:inline;margin-right:4px}
+    .c-sl,.c-st{align-self:center}
+    .reg-row .sub{font-size:12.5px}
+  }
+</style>
+</helmet>
+
+<sc-if value="{{ booting }}" hint-placeholder-val="{{ false }}">
+  <div class="splash">
+    <div class="logo">CW</div>
+    <div class="muted">Restoring your session...</div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+  <main class="login-wrap">
+    <div class="login-card">
+      <div class="brand-row">
+        <div class="logo" aria-hidden="true">CW</div>
+        <div>
+          <h1 class="login-title">File Movement Register</h1>
+          <div class="muted sm">Civil Department, P&amp;D, WZPDCL, Khulna</div>
+        </div>
+      </div>
+      <label class="fld"><span class="fld-lbl">User ID</span>
+        <input id="login-id" class="inp" value="{{ loginId }}" sc-camel-on-change="{{ onLoginId }}" autocomplete="username" autocapitalize="none" spellcheck="false">
+      </label>
+      <label class="fld"><span class="fld-lbl">Password</span>
+        <input type="password" class="inp" value="{{ loginPass }}" sc-camel-on-change="{{ onLoginPass }}" sc-camel-on-key-down="{{ onLoginKey }}" autocomplete="current-password">
+      </label>
+      <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
+        <div class="alert err" role="alert">{{ loginErr }}</div>
+      </sc-if>
+      <button class="btn primary block" sc-camel-on-click="{{ doLogin }}" disabled="{{ loginBusy }}">{{ loginBtn }}</button>
+      <p class="hint">Accounts are created by the register administrator. Forgot your password? Ask the administrator to reset it.</p>
+    </div>
+    <sc-if value="{{ demoMode }}" hint-placeholder-val="{{ false }}">
+      <div class="demo-box">
+        <div class="t">Demo accounts (click to fill)</div>
+        <div class="chips">
+          <sc-for list="{{ credChips }}" as="c" hint-placeholder-count="4">
+            <button class="chip" sc-camel-on-click="{{ c.fill }}">{{ c.label }} <span class="r">{{ c.role }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+</sc-if>
+
+<sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+<div class="app">
+  <nav class="side" aria-label="Main">
+    <div class="side-brand">
+      <div class="logo sm" aria-hidden="true">CW</div>
+      <div>
+        <div class="side-title">File Register</div>
+        <div class="side-sub">Civil, P&amp;D, WZPDCL</div>
+      </div>
+    </div>
+    <div class="nav">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="2">
+        <button class="{{ n.cls }}" sc-camel-on-click="{{ n.go }}" aria-current="{{ n.current }}">{{ n.icon }}<span>{{ n.label }}</span><sc-if value="{{ n.hasCount }}" hint-placeholder-val="{{ false }}"><span class="count" aria-label="{{ n.countLabel }}">{{ n.count }}</span></sc-if></button>
+      </sc-for>
+    </div>
+    <div class="side-me">
+      <div class="me-name">{{ meName }}</div>
+      <div class="me-desig">{{ meDesig }}</div>
+      <div class="me-actions">
+        <button class="btn side-btn" sc-camel-on-click="{{ openChangePass }}" aria-label="Change password" title="Change password">{{ icKey }}<span class="t">Password</span></button>
+        <button class="btn side-btn" sc-camel-on-click="{{ doLogout }}" aria-label="Sign out" title="Sign out">{{ icLogout }}<span class="t">Sign out</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main" id="main">
+    <sc-if value="{{ demoMode }}" hint-placeholder-val="{{ false }}">
+      <div class="demo-banner">Demo mode: sample officers and files. Changes are kept only until the page is reloaded.</div>
+    </sc-if>
+
+    <!-- ============================== MY DESK ============================== -->
+    <sc-if value="{{ isDesk }}" hint-placeholder-val="{{ false }}">
+      <section class="page" aria-labelledby="desk-title">
+        <header class="page-head">
+          <div>
+            <h2 class="h2" id="desk-title">{{ greeting }}</h2>
+            <p class="muted">{{ todayTxt }}</p>
+          </div>
+          <div class="head-actions">
+            <sc-if value="{{ canRegister }}" hint-placeholder-val="{{ false }}">
+              <button class="btn primary" sc-camel-on-click="{{ openRegister }}">{{ icPlus }}<span>Register incoming file</span></button>
+            </sc-if>
+            <button class="btn" sc-camel-on-click="{{ doRefresh }}" disabled="{{ loading }}">{{ icRefresh }}<span>{{ refreshLabel }}</span></button>
+          </div>
+        </header>
+
+        <div class="panel">
+          <h3 class="h3">{{ icInbox }}<span>Awaiting your receipt</span><span class="pill warn">{{ awaitCount }}</span></h3>
+          <p class="muted sm">Confirm receipt only when the physical file has reached your desk.</p>
+          <sc-if value="{{ awaitEmpty }}" hint-placeholder-val="{{ false }}"><div class="empty">No files are waiting for you to receive.</div></sc-if>
+          <div class="desk-list">
+            <sc-for list="{{ awaitList }}" as="f" hint-placeholder-count="2">
+              <div class="desk-item">
+                <div class="desk-main">
+                  <div class="ref mono">Sl. {{ f.sl }} | {{ f.ref }}</div>
+                  <div class="subj">{{ f.subject }}</div>
+                  <div class="muted sm">{{ f.line }}</div>
+                </div>
+                <div class="desk-acts">
+                  <button class="btn primary" sc-camel-on-click="{{ f.quickConfirm }}" disabled="{{ f.busy }}">{{ icCheck }}<span>{{ f.confirmLabel }}</span></button>
+                  <button class="btn" sc-camel-on-click="{{ f.open }}">Other time / details</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 class="h3">{{ icFolder }}<span>Files with you</span><span class="pill">{{ withCount }}</span></h3>
+          <p class="muted sm">You are responsible for these files until the next officer confirms receipt.</p>
+          <sc-if value="{{ withEmpty }}" hint-placeholder-val="{{ false }}"><div class="empty">You are not holding any files.</div></sc-if>
+          <div class="desk-list">
+            <sc-for list="{{ withList }}" as="f" hint-placeholder-count="2">
+              <div class="desk-item">
+                <div class="desk-main">
+                  <div class="ref mono">Sl. {{ f.sl }} | {{ f.ref }}</div>
+                  <div class="subj">{{ f.subject }}</div>
+                  <div class="muted sm">{{ f.line }}</div>
+                </div>
+                <div class="desk-acts">
+                  <button class="btn" sc-camel-on-click="{{ f.open }}">{{ icSend }}<span>{{ sendShort }}</span></button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 class="h3">{{ icSend }}<span>Sent by you, not yet received</span><span class="pill">{{ sentCount }}</span></h3>
+          <sc-if value="{{ sentEmpty }}" hint-placeholder-val="{{ false }}"><div class="empty">Nothing is waiting on another officer's confirmation.</div></sc-if>
+          <div class="desk-list">
+            <sc-for list="{{ sentList }}" as="f" hint-placeholder-count="1">
+              <div class="desk-item">
+                <div class="desk-main">
+                  <div class="ref mono">Sl. {{ f.sl }} | {{ f.ref }}</div>
+                  <div class="subj">{{ f.subject }}</div>
+                  <div class="muted sm">{{ f.line }}</div>
+                </div>
+                <div class="desk-acts">
+                  <button class="btn" sc-camel-on-click="{{ f.open }}">Details</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- ============================== REGISTER ============================== -->
+    <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+      <section class="page" aria-labelledby="reg-title">
+        <header class="page-head">
+          <div>
+            <h2 class="h2" id="reg-title">File movement register</h2>
+            <p class="muted">{{ regSummary }}</p>
+          </div>
+          <div class="head-actions">
+            <sc-if value="{{ canRegister }}" hint-placeholder-val="{{ false }}">
+              <button class="btn primary" sc-camel-on-click="{{ openRegister }}">{{ icPlus }}<span>Register incoming file</span></button>
+            </sc-if>
+            <sc-if value="{{ canExport }}" hint-placeholder-val="{{ false }}">
+              <button class="btn" sc-camel-on-click="{{ exportCsv }}">{{ icDownload }}<span>Download CSV</span></button>
+            </sc-if>
+            <button class="btn" sc-camel-on-click="{{ doRefresh }}" disabled="{{ loading }}">{{ icRefresh }}<span>{{ refreshLabel }}</span></button>
+          </div>
+        </header>
+
+        <div class="toolbar">
+          <label class="fld grow"><span class="fld-lbl">Search by file no., subject or officer name</span>
+            <span class="search">{{ icSearch }}<input class="inp" type="search" value="{{ q }}" sc-camel-on-change="{{ onQ }}" placeholder="e.g. SE/P&amp;D/125 or Kamrul"></span>
+          </label>
+          <div class="fld">
+            <span class="fld-lbl" id="st-lbl">Status</span>
+            <div class="seg" role="group" aria-labelledby="st-lbl">
+              <sc-for list="{{ statusTabs }}" as="t" hint-placeholder-count="3">
+                <button class="{{ t.cls }}" aria-pressed="{{ t.pressed }}" sc-camel-on-click="{{ t.go }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div class="reg">
+          <div class="reg-head" aria-hidden="true">
+            <span>Sl.</span><span>Received</span><span>Reference / File No.</span><span>Subject</span><span>Received from</span><span>Current holder</span><span>Last movement</span><span>Status</span>
+          </div>
+          <sc-if value="{{ regEmpty }}" hint-placeholder-val="{{ false }}"><div class="empty" style="margin:12px">{{ regEmptyTxt }}</div></sc-if>
+          <sc-for list="{{ regRows }}" as="r" hint-placeholder-count="5">
+            <button class="reg-row" sc-camel-on-click="{{ r.open }}" aria-label="{{ r.aria }}">
+              <span class="c c-sl"><span class="lbl">Sl.</span><span class="mono strong">{{ r.sl }}</span></span>
+              <span class="c c-date"><span class="lbl">Received</span><span class="mono">{{ r.recDate }}</span></span>
+              <span class="c c-ref"><span class="lbl">Reference / File No.</span><span class="mono strong" style="color:var(--brand)">{{ r.ref }}</span></span>
+              <span class="c c-subj"><span class="lbl">Subject</span><span class="strong">{{ r.subject }}</span></span>
+              <span class="c c-from"><span class="lbl">Received from</span><span>{{ r.from }}</span></span>
+              <span class="c c-holder"><span class="lbl">Current holder</span><span class="strong">{{ r.holder }}</span><span class="sub">{{ r.holderSub }}</span></span>
+              <span class="c c-last"><span class="lbl">Last movement</span><span class="mono">{{ r.lastAt }}</span><span class="sub">{{ r.lastDesc }}</span></span>
+              <span class="c c-st"><span class="lbl">Status</span><span class="{{ r.badgeCls }}">{{ r.badgeIcon }}{{ r.status }}</span></span>
+            </button>
+          </sc-for>
+        </div>
+        <div class="reg-foot">{{ regFoot }}</div>
+      </section>
+    </sc-if>
+
+    <!-- ============================== FILE DETAIL ============================== -->
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <section class="page" aria-labelledby="file-title">
+        <button class="btn ghost back" sc-camel-on-click="{{ goBack }}">{{ icBack }}<span>{{ backLabel }}</span></button>
+
+        <sc-if value="{{ detailMissing }}" hint-placeholder-val="{{ false }}">
+          <div class="panel">
+            <h2 class="h2" id="file-title">File not found</h2>
+            <p class="muted">This file does not exist or you have not handled it. Officers can only see files that have been sent to them.</p>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ detailFound }}" hint-placeholder-val="{{ false }}">
+          <header class="detail-head">
+            <div class="mono muted">Sl. {{ d.sl }} | {{ d.ref }}</div>
+            <h2 class="h2" id="file-title">{{ d.subject }}</h2>
+            <span class="{{ d.badgeCls }}">{{ d.badgeIcon }}{{ d.status }}</span>
+          </header>
+
+          <div class="detail-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h3 class="h3">File information</h3>
+                <sc-if value="{{ canCorrectFile }}" hint-placeholder-val="{{ false }}">
+                  <button class="btn" sc-camel-on-click="{{ openCorrect }}">{{ icEdit }}<span>Correct details</span></button>
+                </sc-if>
+              </div>
+              <dl class="meta">
+                <sc-for list="{{ d.meta }}" as="m" hint-placeholder-count="5">
+                  <div class="meta-row"><dt>{{ m.k }}</dt><dd>{{ m.v }}</dd></div>
+                </sc-for>
+              </dl>
+            </div>
+
+            <div class="panel action-panel">
+              <sc-if value="{{ actConfirm }}" hint-placeholder-val="{{ false }}">
+                <h3 class="h3">{{ icInbox }}<span>Confirm receipt</span></h3>
+                <p class="sm">{{ confirmIntro }}</p>
+                <fieldset class="radio-group">
+                  <legend class="fld-lbl">When did the file reach you?</legend>
+                  <label class="radio"><input type="radio" name="rtime" checked="{{ cNow }}" sc-camel-on-change="{{ pickNow }}"> Just now</label>
+                  <label class="radio"><input type="radio" name="rtime" checked="{{ cEarlier }}" sc-camel-on-change="{{ pickEarlier }}"> Earlier, at a specific time</label>
+                </fieldset>
+                <sc-if value="{{ cEarlier }}" hint-placeholder-val="{{ false }}">
+                  <label class="fld"><span class="fld-lbl">Actual receipt date and time</span>
+                    <input id="c-at" type="datetime-local" class="inp" value="{{ cAt }}" min="{{ cMin }}" max="{{ cMax }}" sc-camel-on-change="{{ onCAt }}">
+                    <span class="hint">{{ cRangeTxt }}</span>
+                  </label>
+                </sc-if>
+                <label class="fld"><span class="fld-lbl">Note (optional)</span>
+                  <textarea class="inp" rows="2" value="{{ cNote }}" sc-camel-on-change="{{ onCNote }}"></textarea>
+                </label>
+                <sc-if value="{{ cErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ cErr }}</div></sc-if>
+                <button class="btn primary block" sc-camel-on-click="{{ doConfirm }}" disabled="{{ confirmBusy }}">{{ icCheck }}<span>{{ confirmBtn }}</span></button>
+              </sc-if>
+
+              <sc-if value="{{ actSend }}" hint-placeholder-val="{{ false }}">
+                <h3 class="h3">{{ icSend }}<span>{{ sendTitle }}</span></h3>
+                <p class="muted sm">{{ sendIntro }}</p>
+                <label class="fld"><span class="fld-lbl">Send to <span class="req">*</span></span>
+                  <sc-raw-select id="s-to" class="inp" value="{{ sTo }}" sc-camel-on-change="{{ onSTo }}">
+                    <option value="">Select officer</option>
+                    <sc-for list="{{ sendOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.id }}">{{ o.label }}</option></sc-for>
+                  </sc-raw-select>
+                </label>
+                <sc-if value="{{ sTypeTxt }}" hint-placeholder-val="{{ false }}"><p class="hint">{{ sTypeTxt }}</p></sc-if>
+                <label class="fld"><span class="fld-lbl">Note / instruction (optional)</span>
+                  <textarea class="inp" rows="2" value="{{ sNote }}" sc-camel-on-change="{{ onSNote }}" placeholder="e.g. Please examine and put up."></textarea>
+                </label>
+                <sc-if value="{{ sErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ sErr }}</div></sc-if>
+                <button class="btn primary block" sc-camel-on-click="{{ doSend }}" disabled="{{ sendBusy }}">{{ icSend }}<span>{{ sendBtn }}</span></button>
+              </sc-if>
+
+              <sc-if value="{{ actClose }}" hint-placeholder-val="{{ false }}">
+                <div class="divider"></div>
+                <h3 class="h3">{{ icArchive }}<span>Send out and close</span></h3>
+                <p class="muted sm">When the work is finished and the file leaves the department (for example, sent back to SE, P&amp;D). The file stays in the register as Closed.</p>
+                <div class="two">
+                  <label class="fld"><span class="fld-lbl">Sent to</span>
+                    <input class="inp" value="{{ clTo }}" sc-camel-on-change="{{ onClTo }}">
+                  </label>
+                  <label class="fld"><span class="fld-lbl">Despatch / memo no. (optional)</span>
+                    <input class="inp mono" value="{{ clRef }}" sc-camel-on-change="{{ onClRef }}" spellcheck="false">
+                  </label>
+                </div>
+                <label class="fld"><span class="fld-lbl">Note (optional)</span>
+                  <textarea class="inp" rows="2" value="{{ clNote }}" sc-camel-on-change="{{ onClNote }}" placeholder="e.g. Approved estimate returned to SE."></textarea>
+                </label>
+                <sc-if value="{{ clErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ clErr }}</div></sc-if>
+                <sc-if value="{{ closeAsk }}" hint-placeholder-val="{{ false }}">
+                  <div class="alert warn" role="alert">{{ icAlert }}<span>Close Sl. {{ d.sl }} as sent to {{ clToShow }}? It can no longer be marked or forwarded unless XEN reopens it.</span></div>
+                  <div class="acts">
+                    <button class="btn primary" sc-camel-on-click="{{ doClose }}" disabled="{{ closeBusy }}">{{ icArchive }}<span>{{ closeBtn }}</span></button>
+                    <button class="btn" sc-camel-on-click="{{ cancelAsk }}">Cancel</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ closeIdle }}" hint-placeholder-val="{{ false }}">
+                  <button class="btn block" sc-camel-on-click="{{ askClose }}">{{ icArchive }}<span>Close file</span></button>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ actClosed }}" hint-placeholder-val="{{ false }}">
+                <h3 class="h3">{{ icArchive }}<span>File closed</span></h3>
+                <p class="sm">{{ closedTxt }}</p>
+                <sc-if value="{{ canReopenFile }}" hint-placeholder-val="{{ false }}">
+                  <div class="divider"></div>
+                  <h3 class="h3">{{ icUndo }}<span>Reopen</span></h3>
+                  <p class="muted sm">If the file has come back (for example, returned by SE for revision) or was closed by mistake. It returns to your desk.</p>
+                  <label class="fld"><span class="fld-lbl">Reason <span class="req">*</span></span>
+                    <textarea class="inp" rows="2" value="{{ roNote }}" sc-camel-on-change="{{ onRoNote }}" placeholder="e.g. Returned by SE for revision."></textarea>
+                  </label>
+                  <sc-if value="{{ roErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ roErr }}</div></sc-if>
+                  <button class="btn block" sc-camel-on-click="{{ doReopen }}" disabled="{{ reopenBusy }}">{{ icUndo }}<span>{{ reopenBtn }}</span></button>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ actRecall }}" hint-placeholder-val="{{ false }}">
+                <h3 class="h3">{{ icClock }}<span>Awaiting receipt</span></h3>
+                <p class="sm">{{ recallTxt }}</p>
+                <p class="hint">If the file was marked to the wrong officer, or has not actually left your desk, you can recall it. The recall is recorded in the history.</p>
+                <sc-if value="{{ recallAsk }}" hint-placeholder-val="{{ false }}">
+                  <div class="alert warn" role="alert">{{ icAlert }}<span>Recall Sl. {{ d.sl }} from {{ recallTo }}? The file will stay with you.</span></div>
+                  <div class="acts">
+                    <button class="btn danger" sc-camel-on-click="{{ doRecall }}" disabled="{{ recallBusy }}">{{ icUndo }}<span>{{ recallBtn }}</span></button>
+                    <button class="btn" sc-camel-on-click="{{ cancelAsk }}">Keep it sent</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ recallIdle }}" hint-placeholder-val="{{ false }}">
+                  <button class="btn" sc-camel-on-click="{{ askRecall }}">{{ icUndo }}<span>Recall (cancel sending)</span></button>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ actNone }}" hint-placeholder-val="{{ false }}">
+                <h3 class="h3">Current position</h3>
+                <p class="sm">{{ noneTxt }}</p>
+              </sc-if>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3 class="h3">Movement history <span class="pill">{{ d.histCount }}</span></h3>
+            <p class="muted sm">Every entry is permanent and cannot be edited. Times are Bangladesh time.</p>
+            <div class="hist-wrap">
+              <div class="hist-inner">
+                <div class="hist-head" aria-hidden="true"><span>#</span><span>Date and time</span><span>Action</span><span>From / To</span><span>Recorded by</span><span>Note</span></div>
+                <ol class="hist">
+                  <sc-for list="{{ d.hist }}" as="e" hint-placeholder-count="3">
+                    <li class="hist-row">
+                      <span class="h-no mono muted">{{ e.no }}</span>
+                      <span><span class="mono">{{ e.at }}</span><span class="sub">{{ e.late }}</span></span>
+                      <span><span class="{{ e.tagCls }}">{{ e.label }}</span></span>
+                      <sc-if value="{{ e.isMove }}" hint-placeholder-val="{{ true }}"><span class="move"><span>{{ e.fromName }}</span>{{ icArrow }}<span class="strong">{{ e.toName }}</span></span></sc-if>
+                      <sc-if value="{{ e.isChange }}" hint-placeholder-val="{{ false }}"><span class="changes"><sc-for list="{{ e.changes }}" as="c"><span class="chg"><span class="strong">{{ c.label }}:</span> <span class="old">{{ c.old }}</span> changed to <span class="strong">{{ c.val }}</span></span></sc-for></span></sc-if>
+                      <span><span class="lbl">Recorded by </span>{{ e.byName }}</span>
+                      <span><span class="lbl">{{ e.noteLbl }}</span>{{ e.note }}</span>
+                    </li>
+                  </sc-for>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <!-- ============================== OFFICERS ============================== -->
+    <sc-if value="{{ isOfficers }}" hint-placeholder-val="{{ false }}">
+      <section class="page" aria-labelledby="off-title">
+        <header class="page-head">
+          <div>
+            <h2 class="h2" id="off-title">Officers</h2>
+            <p class="muted">Only officers listed here can sign in and receive files. Deactivate an officer who has left; their history stays in the register.</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn primary" sc-camel-on-click="{{ toggleOf }}">{{ icPlus }}<span>Add officer</span></button>
+          </div>
+        </header>
+
+        <sc-if value="{{ tempShow }}" hint-placeholder-val="{{ false }}">
+          <div class="alert ok" role="status">
+            {{ icKey }}
+            <div style="flex:1">
+              <div class="strong">{{ tempTitle }}</div>
+              <div>User ID: <span class="mono strong">{{ tempId }}</span> | Temporary password: <span class="mono strong">{{ tempPass }}</span></div>
+              <div class="sm">Give these to the officer. They must set their own password at first sign-in. This password is not shown again.</div>
+            </div>
+            <button class="toast-x" sc-camel-on-click="{{ dismissTemp }}" aria-label="Dismiss">{{ icX }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ ofOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+            <h3 class="h3">New officer account</h3>
+            <div class="form-grid">
+              <label class="fld"><span class="fld-lbl">Full name <span class="req">*</span></span><input id="of-name" class="inp" value="{{ ofName }}" sc-camel-on-change="{{ onOfName }}"></label>
+              <label class="fld"><span class="fld-lbl">Role <span class="req">*</span></span>
+                <sc-raw-select class="inp" value="{{ ofRole }}" sc-camel-on-change="{{ onOfRole }}">
+                  <sc-for list="{{ roleOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+                </sc-raw-select>
+              </label>
+              <label class="fld"><span class="fld-lbl">Designation</span><input class="inp" value="{{ ofDesig }}" sc-camel-on-change="{{ onOfDesig }}" placeholder="{{ ofDesigPh }}"></label>
+              <label class="fld"><span class="fld-lbl">User ID <span class="req">*</span></span><input class="inp mono" value="{{ ofId }}" sc-camel-on-change="{{ onOfId }}" placeholder="e.g. sde.kamrul" autocapitalize="none" spellcheck="false"></label>
+              <label class="fld"><span class="fld-lbl">Temporary password <span class="req">*</span></span>
+                <span style="display:flex;gap:8px"><input class="inp mono" value="{{ ofPass }}" sc-camel-on-change="{{ onOfPass }}" autocomplete="off"><button class="btn" sc-camel-on-click="{{ genPass }}">Generate</button></span>
+              </label>
+            </div>
+            <p class="hint">User ID: lowercase letters, digits, dot, dash or underscore. Temporary password: at least 8 characters.</p>
+            <sc-if value="{{ ofErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ ofErr }}</div></sc-if>
+            <div class="acts">
+              <button class="btn primary" sc-camel-on-click="{{ doAddOfficer }}" disabled="{{ ofBusy }}">{{ ofBtn }}</button>
+              <button class="btn" sc-camel-on-click="{{ toggleOf }}">Cancel</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <div class="panel">
+          <sc-for list="{{ officers }}" as="o" hint-placeholder-count="5">
+            <div class="{{ o.rowCls }}">
+              <div>
+                <div class="strong off-name">{{ o.name }}</div>
+                <div class="muted sm">{{ o.desig }}</div>
+              </div>
+              <div class="sm"><span class="mono">{{ o.id }}</span><span class="sub">{{ o.heldTxt }}</span></div>
+              <div><span class="{{ o.badgeCls }}">{{ o.statusTxt }}</span></div>
+              <div class="acts">
+                <sc-if value="{{ o.idle }}" hint-placeholder-val="{{ false }}">
+                  <button class="btn" sc-camel-on-click="{{ o.askReset }}">Reset password</button>
+                  <sc-if value="{{ o.active }}" hint-placeholder-val="{{ false }}"><button class="btn" sc-camel-on-click="{{ o.askDeact }}">Deactivate</button></sc-if>
+                  <sc-if value="{{ o.inactive }}" hint-placeholder-val="{{ false }}"><button class="btn" sc-camel-on-click="{{ o.activate }}" disabled="{{ o.busy }}">Activate</button></sc-if>
+                </sc-if>
+                <sc-if value="{{ o.resetAsk }}" hint-placeholder-val="{{ false }}">
+                  <span class="sm strong">Issue a new temporary password?</span>
+                  <button class="btn primary" sc-camel-on-click="{{ o.doReset }}" disabled="{{ o.busy }}">Yes, reset</button>
+                  <button class="btn" sc-camel-on-click="{{ cancelAsk }}">Cancel</button>
+                </sc-if>
+                <sc-if value="{{ o.deactAsk }}" hint-placeholder-val="{{ false }}">
+                  <span class="sm strong">Stop this officer signing in?</span>
+                  <button class="btn danger" sc-camel-on-click="{{ o.doDeact }}" disabled="{{ o.busy }}">Yes, deactivate</button>
+                  <button class="btn" sc-camel-on-click="{{ cancelAsk }}">Cancel</button>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+</div>
+
+<!-- ============================== REGISTER INCOMING FILE ============================== -->
+<sc-if value="{{ rfOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rf-title">
+      <div>
+        <h2 class="h2" id="rf-title">Register incoming file</h2>
+        <p class="muted sm">The register serial number and the first history entry are created automatically.</p>
+      </div>
+      <label class="fld"><span class="fld-lbl">Reference / File No. <span class="req">*</span></span>
+        <input id="rf-ref" class="inp mono" value="{{ rfRef }}" sc-camel-on-change="{{ onRfRef }}" placeholder="e.g. SE/P&amp;D/125" spellcheck="false">
+      </label>
+      <label class="fld"><span class="fld-lbl">Subject <span class="req">*</span></span>
+        <input class="inp" value="{{ rfSubject }}" sc-camel-on-change="{{ onRfSubject }}">
+      </label>
+      <div class="two">
+        <label class="fld"><span class="fld-lbl">Received from</span>
+          <input class="inp" value="{{ rfFrom }}" sc-camel-on-change="{{ onRfFrom }}">
+        </label>
+        <label class="fld"><span class="fld-lbl">Date and time received <span class="req">*</span></span>
+          <input type="datetime-local" class="inp" value="{{ rfAt }}" max="{{ rfMax }}" sc-camel-on-change="{{ onRfAt }}">
+        </label>
+      </div>
+      <label class="fld"><span class="fld-lbl">{{ rfMarkLabel }}</span>
+        <sc-raw-select class="inp" value="{{ rfMarkTo }}" sc-camel-on-change="{{ onRfMarkTo }}">
+          <option value="">Keep with me for now</option>
+          <sc-for list="{{ sendOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.id }}">{{ o.label }}</option></sc-for>
+        </sc-raw-select>
+        <span class="hint">{{ rfMarkHint }}</span>
+      </label>
+      <sc-if value="{{ rfHasMark }}" hint-placeholder-val="{{ false }}">
+        <label class="fld"><span class="fld-lbl">Instruction to the officer (optional)</span>
+          <textarea class="inp" rows="2" value="{{ rfMarkNote }}" sc-camel-on-change="{{ onRfMarkNote }}" placeholder="e.g. Please examine and put up."></textarea>
+        </label>
+      </sc-if>
+      <label class="fld"><span class="fld-lbl">Receiving note (optional)</span>
+        <input class="inp" value="{{ rfNote }}" sc-camel-on-change="{{ onRfNote }}" placeholder="e.g. Received by hand from SE office peon">
+      </label>
+      <sc-if value="{{ rfDupShow }}" hint-placeholder-val="{{ false }}">
+        <div class="alert warn" role="alert">{{ icAlert }}<span>{{ rfDupTxt }} Check that this is not the same file. To record it as a separate entry, press "Register anyway".</span></div>
+      </sc-if>
+      <sc-if value="{{ rfErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ rfErr }}</div></sc-if>
+      <div class="acts">
+        <button class="btn primary" sc-camel-on-click="{{ doRegister }}" disabled="{{ rfBusy }}">{{ rfBtn }}</button>
+        <button class="btn" sc-camel-on-click="{{ closeRegister }}">Cancel</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ============================== CORRECT REGISTRATION DETAILS ============================== -->
+<sc-if value="{{ cfOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cf-title">
+      <div>
+        <h2 class="h2" id="cf-title">Correct details of Sl. {{ d.sl }}</h2>
+        <p class="muted sm">Use this only to fix a mistake made while registering. The old and new values, your name and the reason are kept permanently in the movement history.</p>
+      </div>
+      <label class="fld"><span class="fld-lbl">Reference / File No. <span class="req">*</span></span>
+        <input id="cf-ref" class="inp mono" value="{{ cfRef }}" sc-camel-on-change="{{ onCfRef }}" spellcheck="false">
+      </label>
+      <label class="fld"><span class="fld-lbl">Subject <span class="req">*</span></span>
+        <input class="inp" value="{{ cfSubject }}" sc-camel-on-change="{{ onCfSubject }}">
+      </label>
+      <div class="two">
+        <label class="fld"><span class="fld-lbl">Received from</span>
+          <input class="inp" value="{{ cfFrom }}" sc-camel-on-change="{{ onCfFrom }}">
+        </label>
+        <label class="fld"><span class="fld-lbl">Date and time received</span>
+          <input type="datetime-local" class="inp" value="{{ cfAt }}" max="{{ cfMax }}" sc-camel-on-change="{{ onCfAt }}">
+        </label>
+      </div>
+      <label class="fld"><span class="fld-lbl">Reason for correction <span class="req">*</span></span>
+        <input class="inp" value="{{ cfReason }}" sc-camel-on-change="{{ onCfReason }}" placeholder="e.g. Typing mistake in reference number">
+      </label>
+      <sc-if value="{{ cfChangeTxt }}" hint-placeholder-val="{{ false }}"><p class="hint">{{ cfChangeTxt }}</p></sc-if>
+      <sc-if value="{{ cfDupShow }}" hint-placeholder-val="{{ false }}">
+        <div class="alert warn" role="alert">{{ icAlert }}<span>{{ cfDupTxt }} Press "Save anyway" only if these really are different files.</span></div>
+      </sc-if>
+      <sc-if value="{{ cfErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ cfErr }}</div></sc-if>
+      <div class="acts">
+        <button class="btn primary" sc-camel-on-click="{{ doCorrect }}" disabled="{{ cfBusy }}">{{ cfBtn }}</button>
+        <button class="btn" sc-camel-on-click="{{ closeCorrect }}">Cancel</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ============================== CHANGE PASSWORD ============================== -->
+<sc-if value="{{ cpOpen }}" hint-placeholder-val="{{ false }}">
+  <div class="overlay">
+    <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="cp-title">
+      <div>
+        <h2 class="h2" id="cp-title">{{ cpTitle }}</h2>
+        <p class="muted sm">{{ cpIntro }}</p>
+      </div>
+      <label class="fld"><span class="fld-lbl">Current password</span>
+        <input id="cp-old" type="password" class="inp" value="{{ cpOld }}" sc-camel-on-change="{{ onCpOld }}" autocomplete="current-password">
+      </label>
+      <label class="fld"><span class="fld-lbl">New password (at least 8 characters)</span>
+        <input type="password" class="inp" value="{{ cpNew }}" sc-camel-on-change="{{ onCpNew }}" autocomplete="new-password">
+      </label>
+      <label class="fld"><span class="fld-lbl">Confirm new password</span>
+        <input type="password" class="inp" value="{{ cpNew2 }}" sc-camel-on-change="{{ onCpNew2 }}" autocomplete="new-password">
+      </label>
+      <sc-if value="{{ cpErr }}" hint-placeholder-val="{{ false }}"><div class="alert err" role="alert">{{ cpErr }}</div></sc-if>
+      <div class="acts">
+        <button class="btn primary" sc-camel-on-click="{{ doChangePass }}" disabled="{{ cpBusy }}">{{ cpBtn }}</button>
+        <sc-if value="{{ cpCancelable }}" hint-placeholder-val="{{ false }}"><button class="btn" sc-camel-on-click="{{ closeCp }}">Cancel</button></sc-if>
+        <sc-if value="{{ cpForced }}" hint-placeholder-val="{{ false }}"><button class="btn ghost" sc-camel-on-click="{{ doLogout }}">Sign out</button></sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastShow }}" hint-placeholder-val="{{ false }}">
+  <div class="{{ toastCls }}" role="status" aria-live="polite">{{ toastIcon }}<span>{{ toastTxt }}</span><button class="toast-x" sc-camel-on-click="{{ dismissToast }}" aria-label="Dismiss message">{{ icX }}</button></div>
+</sc-if>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+/* ================= CONFIG =================
+ * Paste the Web App URL of the register's Google Apps Script (ends in /exec)
+ * between the quotes to go LIVE. Leave it empty for DEMO mode
+ * (sample officers and files, nothing is saved). See SETUP-REGISTER.md.
+ */
+const API_URL = '';
+
+const DEMO = !API_URL;
+const LS_TOKEN = 'cwreg_token', LS_USER = 'cwreg_user';
+const h = React.createElement;
+const RC = RegisterCore;
+const ROLE_ORDER = { XEN: 0, SDE: 1, AE: 2, SAE: 3, Staff: 4, Admin: 9 };
+const EV_LABEL = { inward: 'Received (inward)', marked: 'Marked', forwarded: 'Forwarded', returned: 'Returned', receipt: 'Receipt confirmed', recalled: 'Recalled',
+  closed: 'Closed (sent out)', reopened: 'Reopened', corrected: 'Details corrected' };
+
+// ---------- icons (Lucide-style outline, 24px grid) ----------
+const ICON_PATHS = {
+  clock: ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M12 6v6l4 2'],
+  check: ['M22 11.08V12a10 10 0 1 1-5.93-9.14', 'M22 4 12 14.01l-3-3'],
+  inbox: ['M22 12h-6l-2 3h-4l-2-3H2', 'M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z'],
+  list: ['M8 6h13', 'M8 12h13', 'M8 18h13', 'M3 6h.01', 'M3 12h.01', 'M3 18h.01'],
+  users: ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M22 21v-2a4 4 0 0 0-3-3.87', 'M16 3.13a4 4 0 0 1 0 7.75'],
+  plus: ['M12 5v14', 'M5 12h14'],
+  send: ['M22 2 11 13', 'M22 2 15 22l-4-9-9-4 20-7z'],
+  undo: ['M9 14 4 9l5-5', 'M4 9h10.5a5.5 5.5 0 0 1 0 11H11'],
+  search: ['M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z', 'm21 21-4.35-4.35'],
+  download: ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'm7 10 5 5 5-5', 'M12 15V3'],
+  refresh: ['M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8', 'M3 3v5h5', 'M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16', 'M16 16h5v5'],
+  back: ['m12 19-7-7 7-7', 'M19 12H5'],
+  arrow: ['M5 12h14', 'm12 5 7 7-7 7'],
+  logout: ['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4', 'm16 17 5-5-5-5', 'M21 12H9'],
+  key: ['m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4', 'm21 2-9.6 9.6', 'M7.5 21a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z'],
+  folder: ['M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'],
+  alert: ['M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z', 'M12 9v4', 'M12 17h.01'],
+  x: ['M18 6 6 18', 'm6 6 12 12'],
+  archive: ['M21 8v13H3V8', 'M1 3h22v5H1z', 'M10 12h4'],
+  edit: ['M12 20h9', 'M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z'],
+};
+function icon(name, size) {
+  const sz = size || 18;
+  return h('svg', { width: sz, height: sz, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': 'true', focusable: 'false' },
+    ICON_PATHS[name].map((d, i) => h('path', { key: i, d })));
+}
+
+// ---------- Dhaka time helpers ('YYYY-MM-DDTHH:mm' strings) ----------
+function dhakaParts(d) {
+  const p = {};
+  new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Dhaka', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    .formatToParts(d).forEach(x => { p[x.type] = x.value; });
+  return p;
+}
+function nowDT() { const p = dhakaParts(new Date()); return p.year + '-' + p.month + '-' + p.day + 'T' + p.hour + ':' + p.minute; }
+function dtMs(dt) { return Date.UTC(+dt.slice(0, 4), +dt.slice(5, 7) - 1, +dt.slice(8, 10), +dt.slice(11, 13), +dt.slice(14, 16)); }
+function shiftDT(dt, mins) {
+  const d = new Date(dtMs(dt) + mins * 60000), z = n => String(n).padStart(2, '0');
+  return d.getUTCFullYear() + '-' + z(d.getUTCMonth() + 1) + '-' + z(d.getUTCDate()) + 'T' + z(d.getUTCHours()) + ':' + z(d.getUTCMinutes());
+}
+function fmtD(dt) { return dt ? dt.slice(8, 10) + '-' + dt.slice(5, 7) + '-' + dt.slice(0, 4) : '-'; }
+function fmtT(dt) { const hh = +dt.slice(11, 13); return String(hh % 12 || 12).padStart(2, '0') + ':' + dt.slice(14, 16) + (hh < 12 ? ' AM' : ' PM'); }
+function fmtDT(dt) { return dt ? fmtD(dt) + ', ' + fmtT(dt) : '-'; }
+function ago(dt, now) {
+  const m = Math.round((dtMs(now) - dtMs(dt)) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + ' min ago';
+  if (m < 1440) { const hr = Math.floor(m / 60); return hr + (hr === 1 ? ' hour ago' : ' hours ago'); }
+  const d = Math.floor(m / 1440); return d + (d === 1 ? ' day ago' : ' days ago');
+}
+function randomPass() {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+  const a = new Uint32Array(10); (window.crypto || window.msCrypto).getRandomValues(a);
+  return Array.from(a, n => chars[n % chars.length]).join('');
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage blocked */ } }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) { /* storage blocked */ } }
+
+// ---------- demo mode: the same register rules run in the browser ----------
+function demoEnv() {
+  let n = 0;
+  return { now: nowDT, uuid: () => 'd' + (++n) + Math.random().toString(36).slice(2, 8), hash: (p, s) => s + '|' + p, randomPass };
+}
+function buildDemoDb(env) {
+  const db = RC.freshDb(env);
+  db.users[0].mustChange = false;
+  const U = (id, name, role) => { const salt = env.uuid(); db.users.push({ id, name, role, desig: RC.DESIG[role], active: true, salt, hash: env.hash('1234', salt), mustChange: false }); };
+  U('xen', 'Engr. Md. Shafiqul Alam', 'XEN');
+  U('sde1', 'Md. Kamrul Hasan', 'SDE');
+  U('sde2', 'Sharmin Akter', 'SDE');
+  U('ae1', 'Farzana Yasmin', 'AE');
+  U('ae2', 'Md. Rakibul Islam', 'AE');
+  U('sae1', 'Md. Alamgir Hossain', 'SAE');
+  U('dak', 'Abdul Karim', 'Staff');
+  const base = nowDT();
+  let clock = base;
+  const env2 = Object.assign({}, env, { now: () => clock });
+  const day = (d, hhmm) => shiftDT(base, -d * 1440).slice(0, 11) + hhmm;
+  const run = (who, action, req, when) => {
+    clock = when;
+    const r = RC.dispatch(db, RC.findUser(db, who), action, req, env2);
+    if (!r.ok) console.warn('[demo seed]', action, r.error);
+    return r;
+  };
+  const reg = (who, ref, subject, when, extra) => run(who, 'registerFile', Object.assign({ ref, subject, from: 'SE, P&D', receivedAt: when }, extra || {}), when).file.sl;
+  let sl;
+
+  sl = reg('xen', 'SE/P&D/2026/109', 'Rate analysis for RCC drain, Jashore zone', day(10, '10:20'));
+  run('xen', 'sendFile', { sl, to: 'sde2', note: 'Check rates against the current schedule.' }, day(10, '11:05'));
+  run('sde2', 'confirmReceipt', { sl }, day(10, '12:10'));
+  run('sde2', 'sendFile', { sl, to: 'sae1', note: 'Collect market rates for cement and rod.' }, day(9, '10:00'));
+  run('sae1', 'confirmReceipt', { sl }, day(9, '10:40'));
+  run('sae1', 'sendFile', { sl, to: 'sde2', note: 'Market rates attached.' }, day(5, '15:10'));
+  run('sde2', 'confirmReceipt', { sl }, day(5, '16:00'));
+  run('sde2', 'sendFile', { sl, to: 'xen', note: 'Rate analysis put up for approval.' }, day(2, '11:30'));
+  run('xen', 'confirmReceipt', { sl }, day(2, '12:00'));
+  run('xen', 'closeFile', { sl, to: 'SE, P&D', ref: 'CW/P&D/OUT/312', note: 'Approved rate analysis returned to SE.' }, day(1, '16:00'));
+
+  sl = reg('xen', 'SE/P&D/2026/115', 'Bill verification: pump house repair, Khalishpur', day(4, '10:00'));
+  run('xen', 'sendFile', { sl, to: 'ae1' }, day(4, '12:00'));
+  run('xen', 'recallFile', { sl, note: 'Marked to the wrong officer.' }, day(4, '12:10'));
+  run('xen', 'sendFile', { sl, to: 'sde1', note: 'Verify measurements and put up.' }, day(4, '12:15'));
+  run('sde1', 'confirmReceipt', { sl, at: day(4, '15:00'), note: 'Entered late; file reached the desk at 3 PM.' }, day(4, '16:40'));
+
+  sl = reg('xen', 'SE/P&D/2026/181', 'Approval of estimate: boundary wall, Khulna S&D office', day(6, '10:15'));
+  run('xen', 'correctFile', { sl, ref: 'SE/P&D/2026/118', reason: 'Digits typed in the wrong order.' }, day(6, '10:40'));
+  run('xen', 'sendFile', { sl, to: 'sde1', note: 'Please examine and put up estimate.' }, day(6, '11:00'));
+  run('sde1', 'confirmReceipt', { sl }, day(6, '14:20'));
+  run('sde1', 'sendFile', { sl, to: 'ae1', note: 'Prepare estimate with site measurement.' }, day(5, '10:05'));
+  run('ae1', 'confirmReceipt', { sl }, day(5, '11:30'));
+
+  sl = reg('dak', 'SE/P&D/2026/121', 'Project proposal: guard room at Daulatpur 33/11kV substation', day(3, '09:40'), { markTo: 'xen' });
+  run('xen', 'confirmReceipt', { sl }, day(3, '10:30'));
+  run('xen', 'sendFile', { sl, to: 'sde2', note: 'Examine the proposal.' }, day(3, '12:00'));
+  run('sde2', 'confirmReceipt', { sl }, day(2, '09:10'));
+  run('sde2', 'sendFile', { sl, to: 'ae2', note: 'Prepare a preliminary cost estimate.' }, day(1, '15:00'));
+
+  sl = reg('xen', 'SE/P&D/2026/124', 'Revised drawing: office building renovation (2nd floor)', day(1, '11:00'));
+  run('xen', 'sendFile', { sl, to: 'sde1', note: 'Check against the approved layout.' }, shiftDT(base, -150));
+
+  reg('xen', 'SE/P&D/2026/125', 'Site inspection report: Satkhira substation land development', shiftDT(base, -300), { note: 'Received by hand.' });
+  return db;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    if (DEMO) { this.demoEnv = demoEnv(); this.demoDb = buildDemoDb(this.demoEnv); this.demoUid = null; }
+    this.token = DEMO ? null : lsGet(LS_TOKEN);
+    let saved = null;
+    if (this.token) { try { saved = JSON.parse(lsGet(LS_USER) || 'null'); } catch (e) { saved = null; } }
+    this.state = Object.assign({
+      user: saved, users: saved ? [saved] : [], files: [],
+      booting: !DEMO && !!this.token, loading: false, busy: '',
+      view: 'desk', selSl: null, prevView: '',
+      loginId: '', loginPass: '', loginErr: '',
+      q: '', fStatus: 'all',
+      rfOpen: false, rfRef: '', rfSubject: '', rfFrom: 'SE, P&D', rfAt: '', rfMarkTo: '', rfMarkNote: '', rfNote: '', rfErr: '', rfDup: null, rfDupTxt: '',
+      cpOpen: false, cpForced: false, cpOld: '', cpNew: '', cpNew2: '', cpErr: '',
+      ofOpen: false, ofName: '', ofRole: 'SDE', ofDesig: '', ofId: '', ofPass: '', ofErr: '', tempMsg: null,
+      cfOpen: false, cfRef: '', cfSubject: '', cfFrom: '', cfAt: '', cfReason: '', cfErr: '', cfDup: null, cfDupTxt: '',
+      toast: null,
+    }, this.blankForms());
+  }
+  blankForms() {
+    return { sTo: '', sNote: '', sErr: '', cMode: 'now', cAt: '', cNote: '', cErr: '', confirmKey: '',
+      clTo: 'SE, P&D', clRef: '', clNote: '', clErr: '', roNote: '', roErr: '', cfOpen: false };
+  }
+
+  componentDidMount() {
+    if (this._wired) return;
+    this._wired = true;
+    this._onHash = () => this.applyHash();
+    this._onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      if (this.state.rfOpen) this.setState({ rfOpen: false });
+      else if (this.state.cfOpen) this.setState({ cfOpen: false });
+      else if (this.state.cpOpen && !this.state.cpForced) this.setState({ cpOpen: false });
+      else if (this.state.confirmKey) this.setState({ confirmKey: '' });
+    };
+    this._onVis = () => {
+      if (document.visibilityState === 'visible' && !DEMO && this.state.user && Date.now() - (this.loadedAt || 0) > 60000) this.load(false, true);
+    };
+    window.addEventListener('hashchange', this._onHash);
+    document.addEventListener('keydown', this._onKey);
+    document.addEventListener('visibilitychange', this._onVis);
+    if (!DEMO && this.token) this.load(true);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('hashchange', this._onHash);
+    document.removeEventListener('keydown', this._onKey);
+    document.removeEventListener('visibilitychange', this._onVis);
+    this._wired = false;
+  }
+
+  // ---------- transport ----------
+  call(action, payload) {
+    if (DEMO) return Promise.resolve(this.local(action, payload || {}));
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ action, token: this.token }, payload || {})),
+    }).then(r => r.json()).then(res => {
+      if (!res.ok && res.code === 'AUTH') this.endSession('Your session has ended. Please sign in again.');
+      return res;
+    });
+  }
+  local(action, req) {
+    const db = this.demoDb, env = this.demoEnv;
+    let res;
+    if (action === 'login') { res = RC.login(db, req.id, req.pass, env); if (res.ok) { this.demoUid = res.user.id; res.token = 'demo'; } }
+    else if (action === 'logout') { this.demoUid = null; res = { ok: true }; }
+    else {
+      const me = RC.findUser(db, this.demoUid);
+      if (!RC.isActive(me)) res = { ok: false, code: 'AUTH', error: 'Session ended.' };
+      else if (action === 'load') res = RC.view(db, me);
+      else res = RC.dispatch(db, me, action, req, env);
+    }
+    if (res.code === 'AUTH') this.endSession('Your session has ended. Please sign in again.');
+    return JSON.parse(JSON.stringify(res));
+  }
+  load(fromBoot, silent) {
+    this.setState({ loading: true });
+    return this.call('load').then(res => {
+      this.loadedAt = Date.now();
+      if (res.ok) {
+        this.setState(st => ({ loading: false, booting: false, user: res.user, users: res.users, files: res.files,
+          cpOpen: res.mustChange ? true : st.cpOpen, cpForced: res.mustChange ? true : st.cpForced }));
+        if (!DEMO) lsSet(LS_USER, JSON.stringify(res.user));
+        if (fromBoot) this.applyHash();
+      } else if (res.code !== 'AUTH') {
+        this.setState({ loading: false, booting: false });
+        this.toast('err', res.error || 'Could not load the register.');
+      }
+    }).catch(() => {
+      this.setState({ loading: false });
+      if (fromBoot) this.endSession('Could not reach the server. Please sign in again.');
+      else if (!silent) this.toast('err', 'Network error. The register could not be refreshed.');
+    });
+  }
+  mutate(action, payload, opts) {
+    opts = opts || {};
+    if (this.state.busy) return Promise.resolve({ ok: false });
+    this.setState({ busy: opts.busyKey || action });
+    return this.call(action, payload).then(res => {
+      this.setState({ busy: '' });
+      if (res.ok) {
+        if (res.file) this.putFile(res.file);
+        if (res.user) this.putUser(res.user);
+        if (opts.ok) opts.ok(res);
+      } else if (res.code === 'PASSWORD_CHANGE_REQUIRED') {
+        this.setState({ cpOpen: true, cpForced: true, cpErr: '' });
+      } else if (res.code !== 'AUTH') {
+        if (opts.fail) opts.fail(res); else this.toast('err', res.error || 'Something went wrong.');
+      }
+      return res;
+    }).catch(() => {
+      this.setState({ busy: '' });
+      const msg = 'Network error. Nothing was saved. Check the connection and try again.';
+      if (opts.fail) opts.fail({ ok: false, error: msg }); else this.toast('err', msg);
+      return { ok: false };
+    });
+  }
+  putFile(file) {
+    this.setState(st => {
+      const exists = st.files.some(f => f.sl === file.sl);
+      return { files: exists ? st.files.map(f => (f.sl === file.sl ? file : f)) : st.files.concat([file]) };
+    });
+  }
+  putUser(user) {
+    this.setState(st => {
+      const exists = st.users.some(u => u.id === user.id);
+      return { users: exists ? st.users.map(u => (u.id === user.id ? user : u)) : st.users.concat([user]),
+        user: st.user && st.user.id === user.id ? user : st.user };
+    });
+  }
+  toast(kind, text) {
+    clearTimeout(this._toastT);
+    this.setState({ toast: { kind, text } });
+    this._toastT = setTimeout(() => this.setState({ toast: null }), kind === 'err' ? 10000 : 5000);
+  }
+  focusSoon(id) { setTimeout(() => { const el = document.getElementById(id); if (el) el.focus(); }, 40); }
+  set(k) { return (e) => this.setState({ [k]: e.target.value }); }
+
+  // ---------- session ----------
+  doLogin() {
+    const s = this.state;
+    if (s.busy) return;
+    const id = s.loginId.trim().toLowerCase(), pass = s.loginPass;
+    if (!id || !pass) { this.setState({ loginErr: 'Enter your user ID and password.' }); return; }
+    this.setState({ busy: 'login', loginErr: '' });
+    this.call('login', { id, pass }).then(res => {
+      if (!res.ok) { this.setState({ busy: '', loginErr: res.error || 'Sign-in failed.' }); return; }
+      this.token = res.token;
+      if (!DEMO) { lsSet(LS_TOKEN, res.token); lsSet(LS_USER, JSON.stringify(res.user)); }
+      this.setState({ busy: '', user: res.user, users: [res.user], files: [], loginId: '', loginPass: '',
+        cpOpen: !!res.mustChange, cpForced: !!res.mustChange, cpOld: res.mustChange ? pass : '', cpNew: '', cpNew2: '', cpErr: '' });
+      this.applyHash();
+      this.load();
+      if (res.mustChange) this.focusSoon('cp-old');
+    }).catch(() => this.setState({ busy: '', loginErr: 'Network error. Check the connection and try again.' }));
+  }
+  endSession(msg) {
+    this.token = null;
+    lsDel(LS_TOKEN); lsDel(LS_USER);
+    this.setState(Object.assign({ user: null, users: [], files: [], booting: false, loading: false, busy: '', loginErr: msg || '',
+      cpOpen: false, cpForced: false, rfOpen: false, ofOpen: false, tempMsg: null, view: 'desk', selSl: null, toast: null }, this.blankForms()));
+  }
+  doLogout() {
+    if (this.token || DEMO) this.call('logout').catch(() => {});
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    this.endSession('');
+  }
+
+  // ---------- navigation (URL hash: #desk, #register, #officers, #file-12) ----------
+  defaultView() { return this.state.user && this.state.user.role === 'Admin' ? 'register' : 'desk'; }
+  applyHash() {
+    const me = this.state.user;
+    if (!me) return;
+    const raw = (location.hash || '').replace(/^#/, '');
+    let view = this.defaultView(), selSl = null;
+    const m = /^file-(\d+)$/.exec(raw);
+    if (m) { view = 'detail'; selSl = Number(m[1]); }
+    else if (raw === 'desk' || raw === 'register' || raw === 'officers') view = raw;
+    if (view === 'officers' && me.role !== 'Admin') view = this.defaultView();
+    if (view === 'desk' && me.role === 'Admin') view = 'register';
+    const s = this.state;
+    if (view === s.view && selSl === s.selSl) return;
+    const prevView = view === 'detail' ? (s.view === 'detail' ? s.prevView : s.view) : s.prevView;
+    this.setState(Object.assign({ view, selSl, prevView }, this.blankForms()));
+    window.scrollTo(0, 0);
+  }
+  goto(view, sl) {
+    const hash = view === 'detail' ? '#file-' + sl : '#' + view;
+    if (location.hash !== hash) location.hash = hash;
+    else this.applyHash();
+  }
+  openFile(sl) { this.goto('detail', sl); }
+
+  // ---------- actions ----------
+  nameOf(id) { const u = this.state.users.find(x => x.id === id); return u ? u.name : id; }
+  openRegister() {
+    this.setState({ rfOpen: true, rfRef: '', rfSubject: '', rfFrom: 'SE, P&D', rfAt: nowDT(), rfMarkTo: '', rfMarkNote: '', rfNote: '', rfErr: '', rfDup: null, rfDupTxt: '' });
+    this.focusSoon('rf-ref');
+  }
+  doRegister() {
+    const s = this.state;
+    const ref = s.rfRef.trim(), subject = s.rfSubject.trim();
+    if (!ref) { this.setState({ rfErr: 'Enter the reference / file number.' }); return; }
+    if (!subject) { this.setState({ rfErr: 'Enter the subject.' }); return; }
+    if (!s.rfAt) { this.setState({ rfErr: 'Enter the date and time the file was received.' }); return; }
+    if (s.rfAt > nowDT()) { this.setState({ rfErr: 'The receiving time cannot be in the future.' }); return; }
+    this.setState({ rfErr: '' });
+    const markTo = s.rfMarkTo;
+    this.mutate('registerFile', { ref, subject, from: s.rfFrom, receivedAt: s.rfAt, note: s.rfNote, markTo, markNote: s.rfMarkNote, allowDuplicate: s.rfDup != null }, {
+      busyKey: 'register',
+      ok: res => {
+        this.setState({ rfOpen: false });
+        this.toast('ok', 'Registered as Sl. ' + res.file.sl + (markTo ? ' and sent to ' + this.nameOf(markTo) + '. It now awaits their receipt.' : '.'));
+        this.openFile(res.file.sl);
+      },
+      fail: res => (res.code === 'DUPLICATE'
+        ? this.setState({ rfDup: res.dupSl, rfDupTxt: res.error })
+        : this.setState({ rfErr: res.error || 'Could not register the file.' })),
+    });
+  }
+  quickConfirm(sl) {
+    this.mutate('confirmReceipt', { sl }, { busyKey: 'confirm:' + sl, ok: () => this.toast('ok', 'Receipt of Sl. ' + sl + ' confirmed. The file is now with you.') });
+  }
+  doConfirm(f) {
+    const s = this.state;
+    let at = '';
+    if (s.cMode === 'earlier') {
+      at = s.cAt;
+      if (!at) { this.setState({ cErr: 'Enter the actual receipt date and time.' }); return; }
+      if (at < f.pendingAt) { this.setState({ cErr: 'The receipt time cannot be earlier than the time the file was sent (' + fmtDT(f.pendingAt) + ').' }); return; }
+      if (at > nowDT()) { this.setState({ cErr: 'The receipt time cannot be in the future.' }); return; }
+    }
+    this.setState({ cErr: '' });
+    const payload = { sl: f.sl, note: s.cNote };
+    if (at) payload.at = at;
+    this.mutate('confirmReceipt', payload, {
+      busyKey: 'confirm:' + f.sl,
+      ok: () => { this.setState(this.blankForms()); this.toast('ok', 'Receipt of Sl. ' + f.sl + ' confirmed. The file is now with you.'); },
+      fail: res => this.setState({ cErr: res.error }),
+    });
+  }
+  doSend(f) {
+    const s = this.state;
+    if (!s.sTo) { this.setState({ sErr: 'Select the officer you are sending the file to.' }); this.focusSoon('s-to'); return; }
+    const to = s.sTo;
+    this.setState({ sErr: '' });
+    this.mutate('sendFile', { sl: f.sl, to, note: s.sNote }, {
+      busyKey: 'send:' + f.sl,
+      ok: () => { this.setState(this.blankForms()); this.toast('ok', 'Sl. ' + f.sl + ' sent to ' + this.nameOf(to) + '. It stays your responsibility until they confirm receipt.'); },
+      fail: res => this.setState({ sErr: res.error }),
+    });
+  }
+  doRecall(f) {
+    this.mutate('recallFile', { sl: f.sl }, {
+      busyKey: 'recall:' + f.sl,
+      ok: () => { this.setState({ confirmKey: '' }); this.toast('ok', 'Sending recalled. Sl. ' + f.sl + ' is back on your desk.'); },
+      fail: res => { this.setState({ confirmKey: '' }); this.toast('err', res.error); },
+    });
+  }
+  doClose(f) {
+    const s = this.state, to = s.clTo.trim() || 'SE, P&D';
+    this.mutate('closeFile', { sl: f.sl, to, ref: s.clRef, note: s.clNote }, {
+      busyKey: 'close:' + f.sl,
+      ok: () => { this.setState(this.blankForms()); this.toast('ok', 'Sl. ' + f.sl + ' closed as sent to ' + to + '.'); },
+      fail: res => this.setState({ confirmKey: '', clErr: res.error }),
+    });
+  }
+  doReopen(f) {
+    const s = this.state;
+    if (!s.roNote.trim()) { this.setState({ roErr: 'Give a reason for reopening, for example "Returned by SE for revision".' }); return; }
+    this.mutate('reopenFile', { sl: f.sl, note: s.roNote }, {
+      busyKey: 'reopen:' + f.sl,
+      ok: () => { this.setState(this.blankForms()); this.toast('ok', 'Sl. ' + f.sl + ' reopened. It is now on your desk.'); },
+      fail: res => this.setState({ roErr: res.error }),
+    });
+  }
+  openCorrect(f) {
+    this.setState({ cfOpen: true, cfRef: f.ref, cfSubject: f.subject, cfFrom: f.from, cfAt: f.receivedAt, cfReason: '', cfErr: '', cfDup: null, cfDupTxt: '' });
+    this.focusSoon('cf-ref');
+  }
+  correctionChanges(f) {
+    const s = this.state, out = [];
+    if (s.cfRef.trim() !== f.ref) out.push('reference');
+    if (s.cfSubject.trim() !== f.subject) out.push('subject');
+    if ((s.cfFrom.trim() || 'SE, P&D') !== f.from) out.push('received from');
+    if (s.cfAt !== f.receivedAt) out.push('date and time received');
+    return out;
+  }
+  doCorrect(f) {
+    const s = this.state;
+    if (!s.cfRef.trim()) { this.setState({ cfErr: 'Enter the reference / file number.' }); return; }
+    if (!s.cfSubject.trim()) { this.setState({ cfErr: 'Enter the subject.' }); return; }
+    if (!s.cfAt) { this.setState({ cfErr: 'Enter the date and time the file was received.' }); return; }
+    if (!this.correctionChanges(f).length) { this.setState({ cfErr: 'Nothing has been changed yet.' }); return; }
+    if (!s.cfReason.trim()) { this.setState({ cfErr: 'Give a reason for the correction.' }); return; }
+    this.setState({ cfErr: '' });
+    this.mutate('correctFile', { sl: f.sl, ref: s.cfRef, subject: s.cfSubject, from: s.cfFrom, receivedAt: s.cfAt, reason: s.cfReason, allowDuplicate: s.cfDup != null }, {
+      busyKey: 'correct:' + f.sl,
+      ok: () => { this.setState({ cfOpen: false }); this.toast('ok', 'Details of Sl. ' + f.sl + ' corrected. The change is recorded in the history.'); },
+      fail: res => (res.code === 'DUPLICATE'
+        ? this.setState({ cfDup: res.dupSl, cfDupTxt: res.error })
+        : this.setState({ cfErr: res.error || 'Could not save the correction.' })),
+    });
+  }
+  doChangePass() {
+    const s = this.state;
+    if (!s.cpOld) { this.setState({ cpErr: 'Enter your current password.' }); return; }
+    if (s.cpNew.length < 8) { this.setState({ cpErr: 'The new password must be at least 8 characters.' }); return; }
+    if (s.cpNew !== s.cpNew2) { this.setState({ cpErr: 'The two new passwords do not match.' }); return; }
+    this.mutate('changePassword', { oldPass: s.cpOld, newPass: s.cpNew }, {
+      busyKey: 'cp',
+      ok: () => { this.setState({ cpOpen: false, cpForced: false, cpOld: '', cpNew: '', cpNew2: '', cpErr: '' }); this.toast('ok', 'Password changed.'); this.load(false, true); },
+      fail: res => this.setState({ cpErr: res.error }),
+    });
+  }
+  doAddOfficer() {
+    const s = this.state;
+    const id = s.ofId.trim().toLowerCase(), name = s.ofName.trim(), pass = s.ofPass;
+    if (!name) { this.setState({ ofErr: 'Enter the officer\'s full name.' }); return; }
+    if (!/^[a-z0-9._-]{2,30}$/.test(id)) { this.setState({ ofErr: 'User ID must be 2 to 30 characters: lowercase letters, digits, dot, dash or underscore.' }); return; }
+    if (pass.length < 8) { this.setState({ ofErr: 'The temporary password must be at least 8 characters.' }); return; }
+    this.mutate('addUser', { user: { id, name, role: s.ofRole, desig: s.ofDesig.trim(), pass } }, {
+      busyKey: 'addUser',
+      ok: res => this.setState({ ofOpen: false, ofName: '', ofDesig: '', ofId: '', ofPass: '', ofErr: '',
+        tempMsg: { title: 'Account created for ' + res.user.name + '.', id: res.user.id, pass } }),
+      fail: res => this.setState({ ofErr: res.error }),
+    });
+  }
+  doReset(u) {
+    this.mutate('resetUserPass', { id: u.id }, {
+      busyKey: 'user:' + u.id,
+      ok: res => this.setState({ confirmKey: '', tempMsg: { title: 'Password reset for ' + res.user.name + '.', id: res.user.id, pass: res.tempPass } }),
+      fail: res => { this.setState({ confirmKey: '' }); this.toast('err', res.error); },
+    });
+  }
+  doSetActive(u, active) {
+    this.mutate('setUserActive', { id: u.id, active }, {
+      busyKey: 'user:' + u.id,
+      ok: res => { this.setState({ confirmKey: '' }); this.toast('ok', res.user.name + (active ? ' can sign in again.' : ' has been deactivated and can no longer sign in.')); },
+      fail: res => { this.setState({ confirmKey: '' }); this.toast('err', res.error); },
+    });
+  }
+  exportCsv(rows) {
+    const esc = v => { let t = String(v == null ? '' : v); if (/^[=+\-@]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; };
+    const head = ['Sl.', 'Received date', 'Reference / File No.', 'Subject', 'Received from', 'Current holder', 'Status', 'Last movement', 'Last movement time'];
+    const lines = [head.map(esc).join(',')].concat(rows.map(r => [r.sl, r.recDate, r.ref, r.subject, r.from, r.holder, r.status, r.lastText, r.lastAt].map(esc).join(',')));
+    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'file-movement-register-' + nowDT().slice(0, 10) + '.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  // ---------- view model ----------
+  evText(e, nm) {
+    switch (e.type) {
+      case 'inward': return 'Received from ' + e.from;
+      case 'marked': return 'Marked to ' + nm(e.to);
+      case 'forwarded': return 'Forwarded to ' + nm(e.to);
+      case 'returned': return 'Returned to ' + nm(e.to);
+      case 'receipt': return 'Received by ' + nm(e.to);
+      case 'recalled': return 'Sending to ' + nm(e.to) + ' recalled';
+      case 'closed': return 'Closed, sent to ' + e.to;
+      case 'reopened': return 'Reopened by ' + nm(e.by);
+      case 'corrected': return 'Details corrected by ' + nm(e.by);
+    }
+    return e.type;
+  }
+  lastMove(f) {
+    for (let i = f.history.length - 1; i >= 0; i--) if (f.history[i].type !== 'corrected') return f.history[i];
+    return f.history[0];
+  }
+  receivedSince(f, uid) {
+    for (let i = f.history.length - 1; i >= 0; i--) {
+      const e = f.history[i];
+      if ((e.type === 'inward' || e.type === 'receipt') && e.to === uid) return e.at;
+    }
+    return f.receivedAt;
+  }
+
+  renderVals() {
+    const s = this.state, me = s.user;
+    if (s.booting) return { booting: true, loggedOut: false, loggedIn: false };
+    if (!me) {
+      return {
+        booting: false, loggedOut: true, loggedIn: false, demoMode: DEMO,
+        loginId: s.loginId, loginPass: s.loginPass, loginErr: s.loginErr,
+        loginBusy: s.busy === 'login', loginBtn: s.busy === 'login' ? 'Signing in...' : 'Sign in',
+        onLoginId: this.set('loginId'), onLoginPass: this.set('loginPass'),
+        onLoginKey: (e) => { if (e.key === 'Enter') this.doLogin(); },
+        doLogin: () => this.doLogin(),
+        credChips: DEMO ? this.demoDb.users.slice().sort((a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role]).map(u => {
+          const pass = u.id === 'admin' ? 'admin123' : '1234';
+          return { label: u.id + ' / ' + pass, role: u.role === 'Staff' ? 'Receiving' : u.role, fill: () => this.setState({ loginId: u.id, loginPass: pass, loginErr: '' }) };
+        }) : [],
+      };
+    }
+
+    const isAdmin = me.role === 'Admin', seeAll = RC.canSeeAll(me), canReg = RC.canRegister(me);
+    const umap = {};
+    s.users.forEach(u => { umap[u.id] = u; });
+    const nm = id => (umap[id] ? umap[id].name : (id || '-'));
+    const dg = id => (umap[id] ? umap[id].desig : '');
+    const now = nowDT();
+    const files = s.files;
+    const busyIs = k => s.busy === k;
+
+    // ----- register rows -----
+    const decor = f => {
+      const pending = !!f.pendingTo, closed = !!f.closed, last = this.lastMove(f);
+      const holderId = pending ? f.pendingTo : f.holder;
+      const lastText = this.evText(last, nm);
+      const state = closed ? 'closed' : pending ? 'awaiting' : 'received';
+      return {
+        sl: f.sl, ref: f.ref, subject: f.subject, from: f.from, recDate: fmtD(f.receivedAt),
+        holder: closed ? 'Sent to ' + f.closedTo : nm(holderId),
+        holderSub: closed ? 'Closed by ' + nm(f.closedBy) : pending ? 'Sent by ' + nm(f.pendingFrom) : dg(holderId),
+        lastAt: fmtDT(last.at), lastText, lastDesc: lastText + ', ' + ago(last.at, now),
+        pending, state, status: closed ? 'Closed' : pending ? 'Awaiting receipt' : 'Received',
+        badgeCls: 'badge ' + (closed ? 'closed' : pending ? 'warn' : 'ok'), badgeIcon: icon(closed ? 'archive' : pending ? 'clock' : 'check', 14),
+        open: () => this.openFile(f.sl),
+        aria: 'Sl. ' + f.sl + ', ' + f.ref + ', ' + f.subject + '. '
+          + (closed ? 'Closed, sent to ' + f.closedTo : (pending ? 'Awaiting receipt by ' : 'With ') + nm(holderId)) + '. Open details.',
+        hay: [f.sl, f.ref, f.subject, f.from, nm(f.holder), nm(f.pendingTo), nm(f.pendingFrom), f.closedTo || '', f.closedRef || ''].join(' ').toLowerCase(),
+      };
+    };
+    const all = files.slice().sort((a, b) => b.sl - a.sl).map(decor);
+    const countOf = st => all.filter(r => r.state === st).length;
+    const awaitingAll = countOf('awaiting'), closedAll = countOf('closed');
+    const q = s.q.trim().toLowerCase();
+    const regRows = all.filter(r => (s.fStatus === 'all' || r.state === s.fStatus) && (!q || r.hay.indexOf(q) !== -1));
+    const tabs = [['all', 'All', all.length], ['awaiting', 'Awaiting receipt', awaitingAll], ['received', 'Received', countOf('received')], ['closed', 'Closed', closedAll]];
+
+    // ----- desk -----
+    const deskItem = (f, line, extra) => Object.assign({ sl: f.sl, ref: f.ref, subject: f.subject, line, open: () => this.openFile(f.sl) }, extra || {});
+    const awaitList = files.filter(f => f.pendingTo === me.id).sort((a, b) => a.pendingAt.localeCompare(b.pendingAt)).map(f => {
+      const busy = busyIs('confirm:' + f.sl);
+      return deskItem(f, 'Sent by ' + nm(f.pendingFrom) + ' on ' + fmtDT(f.pendingAt) + ' (' + ago(f.pendingAt, now) + ')' + (this.lastNote(f) ? '. Note: ' + this.lastNote(f) : ''),
+        { busy, confirmLabel: busy ? 'Saving...' : 'Received now', quickConfirm: () => this.quickConfirm(f.sl) });
+    });
+    const withList = files.filter(f => f.holder === me.id && !f.pendingTo && !f.closed).sort((a, b) => b.sl - a.sl).map(f => {
+      const since = this.receivedSince(f, me.id);
+      return deskItem(f, 'With you since ' + fmtDT(since) + ' (' + ago(since, now) + ')');
+    });
+    const sentList = files.filter(f => f.pendingFrom === me.id).sort((a, b) => a.pendingAt.localeCompare(b.pendingAt))
+      .map(f => deskItem(f, 'Sent to ' + nm(f.pendingTo) + ' on ' + fmtDT(f.pendingAt) + ' (' + ago(f.pendingAt, now) + '). Not yet received.'));
+
+    // ----- send targets -----
+    const sendOptions = s.users.filter(u => u.active && u.id !== me.id && u.role !== 'Admin')
+      .sort((a, b) => (ROLE_ORDER[a.role] - ROLE_ORDER[b.role]) || a.name.localeCompare(b.name))
+      .map(u => ({ id: u.id, label: u.name + ', ' + u.desig }));
+
+    // ----- detail -----
+    const vals = {};
+    let d = { meta: [], hist: [] }, detailFound = false;
+    const f = s.view === 'detail' ? files.find(x => x.sl === s.selSl) : null;
+    if (f) {
+      detailFound = true;
+      const pending = !!f.pendingTo, closed = !!f.closed;
+      const since = this.receivedSince(f, f.holder);
+      const meta = [
+        { k: 'Register Sl.', v: String(f.sl) },
+        { k: 'Reference / File No.', v: f.ref },
+        { k: 'Subject', v: f.subject },
+        { k: 'Received from', v: f.from },
+        { k: 'Received at office', v: fmtDT(f.receivedAt) },
+        { k: 'Registered by', v: nm(f.createdBy) + ' on ' + fmtDT(f.createdAt) },
+      ];
+      if (closed) {
+        meta.push({ k: 'Closed', v: 'Sent to ' + f.closedTo + ' by ' + nm(f.closedBy) + ' on ' + fmtDT(f.closedAt) + (f.closedRef ? ', despatch no. ' + f.closedRef : '') + '.' });
+      } else {
+        meta.push({ k: 'Current holder', v: pending ? nm(f.pendingTo) + ' (not yet received)' : nm(f.holder) + ', ' + dg(f.holder) });
+        meta.push({ k: 'Responsible now', v: pending
+          ? nm(f.pendingFrom) + ', until ' + nm(f.pendingTo) + ' confirms receipt. Sent on ' + fmtDT(f.pendingAt) + ' (' + ago(f.pendingAt, now) + ').'
+          : nm(f.holder) + ', since ' + fmtDT(since) + ' (' + ago(since, now) + ').' });
+      }
+      const corrections = f.history.filter(e => e.type === 'corrected').length;
+      if (corrections) meta.push({ k: 'Corrections', v: corrections + ' correction(s) made to these details. See the movement history.' });
+      d = {
+        sl: f.sl, ref: f.ref, subject: f.subject,
+        status: closed ? 'Closed, sent to ' + f.closedTo : pending ? 'Awaiting receipt by ' + nm(f.pendingTo) : 'Received by ' + nm(f.holder),
+        badgeCls: 'badge ' + (closed ? 'closed' : pending ? 'warn' : 'ok'), badgeIcon: icon(closed ? 'archive' : pending ? 'clock' : 'check', 14),
+        meta,
+        histCount: f.history.length,
+        hist: f.history.map((e, i) => {
+          const isChange = e.type === 'corrected';
+          let fromName = nm(e.from), toName = nm(e.to);
+          if (e.type === 'inward') fromName = e.from;
+          if (e.type === 'recalled') fromName = nm(e.by);
+          if (e.type === 'closed') toName = e.to;
+          if (e.type === 'reopened') fromName = e.from || 'Outside';
+          const note = [e.ref ? 'Despatch no. ' + e.ref + '.' : '', e.note || ''].filter(Boolean).join(' ');
+          return {
+            no: i + 1, at: fmtDT(e.at),
+            late: e.recAt && e.recAt !== e.at ? 'Recorded at ' + fmtDT(e.recAt) : '',
+            label: EV_LABEL[e.type] || e.type, tagCls: 'tag t-' + e.type,
+            isMove: !isChange, isChange,
+            changes: isChange ? (e.changes || []).map(c => ({
+              label: c.label, old: c.field === 'receivedAt' ? fmtDT(c.old) : c.old, val: c.field === 'receivedAt' ? fmtDT(c.val) : c.val,
+            })) : [],
+            fromName, toName,
+            byName: nm(e.by), note, noteLbl: note ? (isChange ? 'Reason: ' : 'Note: ') : '',
+          };
+        }),
+      };
+
+      const actConfirm = !closed && f.pendingTo === me.id;
+      const actSend = !closed && !pending && f.holder === me.id;
+      const actClose = actSend && RC.canClose(me);
+      const closeKey = 'close:' + f.sl;
+      const actRecall = pending && f.pendingFrom === me.id;
+      const isXen = me.role === 'XEN';
+      let sTypeTxt = '';
+      if (actSend && s.sTo) {
+        const heldBefore = f.history.some(e => (e.type === 'inward' || e.type === 'receipt') && e.to === s.sTo);
+        const type = isXen ? 'marked' : (heldBefore ? 'returned' : 'forwarded');
+        sTypeTxt = 'This will be recorded as "' + EV_LABEL[type] + '" to ' + nm(s.sTo) + '. You remain responsible until ' + nm(s.sTo) + ' confirms receipt.';
+      }
+      const recallKey = 'recall:' + f.sl;
+      Object.assign(vals, {
+        actConfirm, actSend, actRecall, actNone: !closed && !actConfirm && !actSend && !actRecall,
+        actClose, actClosed: closed,
+        canCorrectFile: RC.canCorrect(me), openCorrect: () => this.openCorrect(f),
+        cfChangeTxt: s.cfOpen && this.correctionChanges(f).length ? 'Changing: ' + this.correctionChanges(f).join(', ') + '.' : '',
+        doCorrect: () => this.doCorrect(f),
+        clTo: s.clTo, onClTo: this.set('clTo'), clRef: s.clRef, onClRef: this.set('clRef'), clNote: s.clNote, onClNote: this.set('clNote'),
+        clErr: s.clErr, clToShow: s.clTo.trim() || 'SE, P&D',
+        closeAsk: s.confirmKey === closeKey, closeIdle: s.confirmKey !== closeKey,
+        askClose: () => this.setState({ confirmKey: closeKey, clErr: '' }),
+        closeBusy: busyIs('close:' + f.sl), closeBtn: busyIs('close:' + f.sl) ? 'Saving...' : 'Yes, close file',
+        doClose: () => this.doClose(f),
+        closedTxt: closed ? 'Sent to ' + f.closedTo + ' by ' + nm(f.closedBy) + ' on ' + fmtDT(f.closedAt) + ' (' + ago(f.closedAt, now) + ')'
+          + (f.closedRef ? ', despatch no. ' + f.closedRef : '') + '. It can no longer be marked or forwarded.' : '',
+        canReopenFile: closed && RC.canReopen(me),
+        roNote: s.roNote, onRoNote: this.set('roNote'), roErr: s.roErr,
+        reopenBusy: busyIs('reopen:' + f.sl), reopenBtn: busyIs('reopen:' + f.sl) ? 'Saving...' : 'Reopen file',
+        doReopen: () => this.doReopen(f),
+        noneTxt: pending
+          ? 'This file was sent to ' + nm(f.pendingTo) + ' by ' + nm(f.pendingFrom) + ' on ' + fmtDT(f.pendingAt) + ' and is awaiting receipt confirmation.'
+          : 'This file is with ' + nm(f.holder) + '. Only the officer holding a file can send it on.',
+        confirmIntro: actConfirm ? 'Sent to you by ' + nm(f.pendingFrom) + ' on ' + fmtDT(f.pendingAt) + '. Confirm only after the physical file has reached your desk.' : '',
+        cNow: s.cMode === 'now', cEarlier: s.cMode === 'earlier',
+        pickNow: () => this.setState({ cMode: 'now', cErr: '' }),
+        pickEarlier: () => { this.setState({ cMode: 'earlier', cAt: s.cAt || now, cErr: '' }); this.focusSoon('c-at'); },
+        cAt: s.cAt, onCAt: this.set('cAt'), cMin: f.pendingAt || '', cMax: now,
+        cRangeTxt: actConfirm ? 'Between ' + fmtDT(f.pendingAt) + ' (when it was sent) and now.' : '',
+        cNote: s.cNote, onCNote: this.set('cNote'), cErr: s.cErr,
+        confirmBusy: busyIs('confirm:' + f.sl), confirmBtn: busyIs('confirm:' + f.sl) ? 'Saving...' : 'Confirm receipt',
+        doConfirm: () => this.doConfirm(f),
+        sendTitle: isXen ? 'Mark this file to an officer' : 'Forward or return this file',
+        sendIntro: isXen ? 'Choose the officer who should deal with this file.' : 'Send the file to the next officer, or return it to the officer who sent it to you.',
+        sTo: s.sTo, onSTo: (e) => this.setState({ sTo: e.target.value, sErr: '' }), sTypeTxt,
+        sNote: s.sNote, onSNote: this.set('sNote'), sErr: s.sErr,
+        sendBusy: busyIs('send:' + f.sl), sendBtn: busyIs('send:' + f.sl) ? 'Saving...' : (isXen ? 'Mark to officer' : 'Send file'),
+        doSend: () => this.doSend(f),
+        recallTxt: actRecall ? 'You sent this file to ' + nm(f.pendingTo) + ' on ' + fmtDT(f.pendingAt) + ' (' + ago(f.pendingAt, now) + '). It is still your responsibility until they confirm receipt.' : '',
+        recallTo: nm(f.pendingTo),
+        recallAsk: s.confirmKey === recallKey, recallIdle: s.confirmKey !== recallKey,
+        askRecall: () => this.setState({ confirmKey: recallKey }),
+        recallBusy: busyIs('recall:' + f.sl), recallBtn: busyIs('recall:' + f.sl) ? 'Saving...' : 'Yes, recall',
+        doRecall: () => this.doRecall(f),
+      });
+    }
+
+    // ----- officers (admin) -----
+    const heldBy = id => files.filter(x => !x.closed && ((x.holder === id && !x.pendingTo) || x.pendingTo === id)).length;
+    const officers = !isAdmin ? [] : s.users.slice()
+      .sort((a, b) => (ROLE_ORDER[a.role] - ROLE_ORDER[b.role]) || a.name.localeCompare(b.name))
+      .map(u => {
+        const manage = u.role !== 'Admin', held = heldBy(u.id);
+        const rk = 'reset:' + u.id, dk = 'deact:' + u.id, busy = busyIs('user:' + u.id);
+        return {
+          id: u.id, name: u.name, desig: u.desig,
+          heldTxt: u.role === 'Admin' ? 'Register administrator' : (held ? 'Holding or due to receive ' + held + ' file(s)' : 'No files at present'),
+          rowCls: 'off-row' + (u.active ? '' : ' inactive'),
+          badgeCls: 'badge ' + (u.active ? 'ok' : 'off'), statusTxt: u.active ? 'Active' : 'Inactive',
+          active: manage && u.active, inactive: manage && !u.active, busy,
+          idle: manage && s.confirmKey !== rk && s.confirmKey !== dk,
+          resetAsk: s.confirmKey === rk, deactAsk: s.confirmKey === dk,
+          askReset: () => this.setState({ confirmKey: rk }), askDeact: () => this.setState({ confirmKey: dk }),
+          doReset: () => this.doReset(u), doDeact: () => this.doSetActive(u, false), activate: () => this.doSetActive(u, true),
+        };
+      });
+
+    // ----- nav -----
+    const navDefs = isAdmin
+      ? [['register', 'File register', 'list', 0], ['officers', 'Officers', 'users', 0]]
+      : [['desk', 'My desk', 'inbox', awaitList.length], ['register', 'File register', 'list', 0]];
+    const viewKey = s.view === 'detail' ? (s.prevView || this.defaultView()) : s.view;
+    const hour = +dhakaParts(new Date()).hour;
+    const toast = s.toast;
+
+    return Object.assign({
+      booting: false, loggedOut: false, loggedIn: true, demoMode: DEMO,
+      meName: me.name, meDesig: me.desig,
+      navItems: navDefs.map(([key, label, ic, count]) => ({
+        label, icon: icon(ic), count, hasCount: count > 0, countLabel: count + ' awaiting your receipt',
+        cls: 'nav-btn' + (viewKey === key ? ' on' : ''), current: viewKey === key ? 'page' : 'false',
+        go: () => this.goto(key),
+      })),
+      openChangePass: () => { this.setState({ cpOpen: true, cpForced: false, cpOld: '', cpNew: '', cpNew2: '', cpErr: '' }); this.focusSoon('cp-old'); },
+      doLogout: () => this.doLogout(),
+      isDesk: s.view === 'desk', isRegister: s.view === 'register', isDetail: s.view === 'detail', isOfficers: s.view === 'officers',
+      greeting: (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + ', ' + me.name.split(' ').slice(-2).join(' '),
+      todayTxt: new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Dhaka', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date()),
+      canRegister: canReg, canExport: seeAll,
+      loading: s.loading, refreshLabel: s.loading ? 'Refreshing...' : 'Refresh', doRefresh: () => this.load(),
+      openRegister: () => this.openRegister(),
+      // desk
+      awaitList, awaitCount: awaitList.length, awaitEmpty: awaitList.length === 0,
+      withList, withCount: withList.length, withEmpty: withList.length === 0,
+      sentList, sentCount: sentList.length, sentEmpty: sentList.length === 0,
+      sendShort: me.role === 'XEN' ? 'Open to mark' : 'Open to send',
+      // register
+      regSummary: seeAll
+        ? all.length + ' files registered, ' + awaitingAll + ' awaiting receipt, ' + closedAll + ' closed'
+        : 'Files that have been sent to you or that you have handled: ' + all.length,
+      q: s.q, onQ: this.set('q'),
+      statusTabs: tabs.map(([key, label, n]) => ({ label: label + ' (' + n + ')', cls: 'seg-btn' + (s.fStatus === key ? ' on' : ''), pressed: s.fStatus === key ? 'true' : 'false', go: () => this.setState({ fStatus: key }) })),
+      regRows, regEmpty: regRows.length === 0,
+      regEmptyTxt: all.length === 0 ? (canReg ? 'No files registered yet. Use "Register incoming file" to add the first one.' : 'No files have been sent to you yet.') : 'No files match this search.',
+      regFoot: regRows.length === all.length ? 'Showing all ' + all.length + ' files, newest first.' : 'Showing ' + regRows.length + ' of ' + all.length + ' files.',
+      exportCsv: () => this.exportCsv(regRows),
+      // detail
+      d, detailFound, detailMissing: s.view === 'detail' && !f,
+      backLabel: 'Back to ' + (s.prevView === 'register' ? 'register' : s.prevView === 'officers' ? 'officers' : (isAdmin ? 'register' : 'my desk')),
+      goBack: () => this.goto(s.prevView || this.defaultView()),
+      cancelAsk: () => this.setState({ confirmKey: '' }),
+      sendOptions,
+      // officers
+      officers, ofOpen: s.ofOpen,
+      toggleOf: () => { this.setState({ ofOpen: !s.ofOpen, ofErr: '' }); if (!s.ofOpen) this.focusSoon('of-name'); },
+      ofName: s.ofName, onOfName: this.set('ofName'), ofRole: s.ofRole, onOfRole: this.set('ofRole'),
+      roleOptions: RC.ROLES.map(r => ({ v: r, label: r === 'Staff' ? 'Office staff (receiving office)' : r })),
+      ofDesig: s.ofDesig, onOfDesig: this.set('ofDesig'), ofDesigPh: RC.DESIG[s.ofRole] || '',
+      ofId: s.ofId, onOfId: this.set('ofId'), ofPass: s.ofPass, onOfPass: this.set('ofPass'),
+      genPass: () => this.setState({ ofPass: randomPass() }),
+      ofErr: s.ofErr, ofBusy: busyIs('addUser'), ofBtn: busyIs('addUser') ? 'Creating...' : 'Create account',
+      doAddOfficer: () => this.doAddOfficer(),
+      tempShow: !!s.tempMsg, tempTitle: s.tempMsg ? s.tempMsg.title : '', tempId: s.tempMsg ? s.tempMsg.id : '', tempPass: s.tempMsg ? s.tempMsg.pass : '',
+      dismissTemp: () => this.setState({ tempMsg: null }),
+      // register modal
+      rfOpen: s.rfOpen, closeRegister: () => this.setState({ rfOpen: false }),
+      rfRef: s.rfRef, onRfRef: (e) => this.setState({ rfRef: e.target.value, rfDup: null, rfDupTxt: '' }),
+      rfSubject: s.rfSubject, onRfSubject: this.set('rfSubject'), rfFrom: s.rfFrom, onRfFrom: this.set('rfFrom'),
+      rfAt: s.rfAt, onRfAt: this.set('rfAt'), rfMax: now,
+      rfMarkTo: s.rfMarkTo, onRfMarkTo: this.set('rfMarkTo'), rfHasMark: !!s.rfMarkTo,
+      rfMarkLabel: me.role === 'XEN' ? 'Mark to officer now (optional)' : 'Send to (optional)',
+      rfMarkHint: me.role === 'XEN' ? 'The officer then confirms receipt when the file reaches them.' : 'Usually the XEN. They confirm receipt when the file reaches them.',
+      rfMarkNote: s.rfMarkNote, onRfMarkNote: this.set('rfMarkNote'), rfNote: s.rfNote, onRfNote: this.set('rfNote'),
+      rfDupShow: s.rfDup != null, rfDupTxt: s.rfDupTxt, rfErr: s.rfErr,
+      rfBusy: busyIs('register'), rfBtn: busyIs('register') ? 'Saving...' : (s.rfDup != null ? 'Register anyway' : 'Register file'),
+      doRegister: () => this.doRegister(),
+      // correction modal
+      cfOpen: s.cfOpen && !!f, closeCorrect: () => this.setState({ cfOpen: false }),
+      cfRef: s.cfRef, onCfRef: (e) => this.setState({ cfRef: e.target.value, cfDup: null, cfDupTxt: '' }),
+      cfSubject: s.cfSubject, onCfSubject: this.set('cfSubject'), cfFrom: s.cfFrom, onCfFrom: this.set('cfFrom'),
+      cfAt: s.cfAt, onCfAt: this.set('cfAt'), cfMax: now, cfReason: s.cfReason, onCfReason: this.set('cfReason'),
+      cfDupShow: s.cfDup != null, cfDupTxt: s.cfDupTxt, cfErr: s.cfErr,
+      cfBusy: !!f && busyIs('correct:' + f.sl), cfBtn: f && busyIs('correct:' + f.sl) ? 'Saving...' : (s.cfDup != null ? 'Save anyway' : 'Save correction'),
+      // change password
+      cpOpen: s.cpOpen, cpForced: s.cpForced, cpCancelable: !s.cpForced,
+      cpTitle: s.cpForced ? 'Set your own password' : 'Change password',
+      cpIntro: s.cpForced ? 'You signed in with a temporary password. Choose your own password to continue.' : 'Choose a new password for your account.',
+      cpOld: s.cpOld, onCpOld: this.set('cpOld'), cpNew: s.cpNew, onCpNew: this.set('cpNew'), cpNew2: s.cpNew2, onCpNew2: this.set('cpNew2'),
+      cpErr: s.cpErr, cpBusy: busyIs('cp'), cpBtn: busyIs('cp') ? 'Saving...' : 'Save new password',
+      closeCp: () => this.setState({ cpOpen: false }), doChangePass: () => this.doChangePass(),
+      // toast
+      toastShow: !!toast, toastCls: 'toast ' + (toast ? toast.kind : ''), toastTxt: toast ? toast.text : '',
+      toastIcon: icon(toast && toast.kind === 'err' ? 'alert' : 'check'),
+      dismissToast: () => this.setState({ toast: null }),
+      // icons
+      icPlus: icon('plus'), icRefresh: icon('refresh'), icDownload: icon('download'), icSearch: icon('search'),
+      icBack: icon('back'), icArrow: icon('arrow', 16), icInbox: icon('inbox'), icFolder: icon('folder'), icSend: icon('send'),
+      icUndo: icon('undo'), icCheck: icon('check'), icX: icon('x'), icKey: icon('key'), icLogout: icon('logout'),
+      icClock: icon('clock'), icAlert: icon('alert'), icArchive: icon('archive'), icEdit: icon('edit'),
+    }, vals);
+  }
+  lastNote(f) { const e = f.history[f.history.length - 1]; return e && e.note ? e.note : ''; }
+}
+</script>
+</body></html>
